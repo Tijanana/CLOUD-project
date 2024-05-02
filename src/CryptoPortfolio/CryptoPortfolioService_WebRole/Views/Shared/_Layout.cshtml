@@ -17,10 +17,14 @@
             </button>
             <div class="collapse navbar-collapse d-sm-inline-flex justify-content-between">
                 <ul class="navbar-nav flex-grow-1">
-                    <li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
+                    @*<li>@Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "nav-link" })</li>
                     <li>@Html.ActionLink("About", "About", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>
-                    <li>@Html.ActionLink("User", "Register", "User", new { area = "" }, new { @class = "nav-link" })</li>
+                    <li>@Html.ActionLink("Contact", "Contact", "Home", new { area = "" }, new { @class = "nav-link" })</li>*@
+                    <li>@Html.ActionLink("User", "Profile", "User", new { area = "" }, new { @class = "nav-link" })</li>
+                </ul>
+                <ul class="navbar-nav flex-grow-1 ml-auto">
+                    <li>@Html.ActionLink("Register", "Register", "Authentication", new { area = "" }, new { @class = "nav-link" })</li>
+                    <li>@Html.ActionLink("Login", "Login", "Authentication", new { area = "" }, new { @class = "nav-link" })</li>
                 </ul>
             </div>
         </div>

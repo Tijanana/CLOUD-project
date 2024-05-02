@@ -1,28 +1,69 @@
 ﻿@model CryptoPortfolioService_Data.Entities.User
 @{
-    ViewBag.Title = "Register";
+    //ViewBag.Title = "EditProfile";
 }
 
-<h2>Register</h2>
+<h2>EditProfile</h2>
 
-<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
-<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
-@using (Html.BeginForm("AddEntity", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
+@*<form action="~/User/ModifyEntity" method="post">
+    <table>
+        <tr>
+            <td>Id:</td>
+            <td><input type="text" name="id" value="@Model.Id" readonly hidden /></td>
+        </tr>
+        <tr>
+            <td>Name:</td>
+            <td><input type="text" name="name" value="@Model.Name" hidden /></td>
+        </tr>
+        <tr>
+            <td>Surname:</td>
+            <td><input type="text" name="manufacturer" value="@Model.Surname" /></td>
+        </tr>
+        <tr>
+            <td>Email:</td>
+            <td><input type="text" name="color" value="@Model.Email" /></td>
+        </tr>
+        <tr>
+            <td>Password:</td>
+            <td><input type="text" name="material" value="@Model.Password" /></td>
+        </tr>
+        <tr>
+            <td>Description:</td>
+            <td><input type="text" name="description" value="@Model.Address" /></td>
+        </tr>
+        <tr>
+            <td>City:</td>
+            <td><input type="text" name="price" value="@Model.City" /></td>
+        </tr>
+        <tr>
+            <td>Country:</td>
+            <td><input type="text" name="price" value="@Model.Country" /></td>
+        </tr>
+        <tr>
+            <td>Phone:</td>
+            <td><input type="text" name="price" value="@Model.Phone" /></td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <input type="submit" value="Edit profile" />
+            </td>
+        </tr>
+    </table>
+</form>*@
+
+@using (Html.BeginForm("ModifyEntity", "User", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     @Html.ValidationSummary(true)
 <fieldset>
     <legend>User</legend>
-    @*<div class="editor-label">
-        @Html.LabelFor(model => model.Id)
+    <div class="editor-field" hidden>
+        @Html.EditorFor(model => model.Id)
     </div>
-    <div class="editor-field">
-        @Html.EditorFor(model => model.Id) @Html.ValidationMessageFor(model => model.Id)
-    </div>*@
     <div class="editor-label">
         @Html.LabelFor(model => model.Name)
     </div>
     <div class="editor-field">
-        @Html.EditorFor(model => model.Name) @Html.ValidationMessageFor(model => model.Name)
+        @Html.EditorFor(model => model.Name) @Html.DisplayFor(model => model.Name) @Html.ValidationMessageFor(model => model.Name)
     </div>
     <div class="editor-label">
         @Html.LabelFor(model => model.Surname)
@@ -68,10 +109,9 @@
     </div>
     <input type="file" id="userPicture" name="file" />
     <p>
-        <input type="submit" value="Create" />
+        <input type="submit" value="Modify" />
     </p>
 </fieldset>
 }
-<div>
-    @Html.ActionLink("Back to List", "Index")
-</div>
+
+

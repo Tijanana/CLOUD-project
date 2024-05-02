@@ -1,0 +1,31 @@
+﻿@*@using CryptoPortfolioService_Data.Entities*@
+@model CryptoPortfolioService_Data.Entities.User
+@{
+    ViewBag.Title = "Profile";
+}
+
+<h2>Profile</h2>
+<table border="1">
+    <tr>
+        <th>Name</th>
+        <th>Surname</th>
+        <th>Email</th>
+        <th>Address</th>
+        <th>City</th>
+        <th>Country</th>
+        <th>Phone</th>
+    </tr>
+    <tr>
+        <td>@Model.Name</td>
+        <td>@Model.Surname</td>
+        <td>@Model.Email</td>
+        <td>@Model.Address</td>
+        <td>@Model.City</td>
+        <td>@Model.Country</td>
+        <td>@Model.Phone</td>
+    </tr>
+</table>
+    
+<button><a href="/User/EditProfile">Modify</a></button>
+<button><a href="/User/Portfolio">Portfolio</a></button>
+

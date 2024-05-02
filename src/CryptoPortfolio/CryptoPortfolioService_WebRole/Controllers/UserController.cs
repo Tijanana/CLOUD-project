@@ -11,56 +11,60 @@ namespace CryptoPortfolioService_WebRole.Controllers
     public class UserController : Controller
     {
         UserRepository _userRepository = new UserRepository();
-        // GET: User
+        private const string LoginViewPath = "~/Views/Authentication/Login.cshtml";
+
         public ActionResult Index()
         {
             return View(_userRepository.RetrieveAllUsers()); // ne treba nam ova metoda (test da li radi)
+        }       
+
+        public ActionResult Profile()
+        {
+            User user = GetUserFromSession();
+            if (user is null)
+                return View(LoginViewPath);
+
+            return View(user);
         }
 
-        public ActionResult Login()
+        public ActionResult EditProfile()
         {
-            return View("Login");
-        }        
+            User user = GetUserFromSession();
+            if (user is null)
+                return View(LoginViewPath);
 
-        public ActionResult Register()
+            return View(user);
+        }
+
+        public ActionResult Portfolio()
         {
-            return View("Register");
+
         }
 
         [HttpPost]
-        public ActionResult AddEntity(string Name, string Surname, 
-                                      string Address, string City, string Country,
-                                      string Phone, string Email, string Password,
-                                      HttpPostedFileBase file)
+        public ActionResult ModifyEntity(string Id, string Name, string Surname,
+                                         string Address, string City, string Country,
+                                         string Phone, string Email, string Password,
+                                         HttpPostedFileBase file)
         {
-            try
-            {
-                if (_userRepository.Exists(Email))
-                {
-                    return View("Error");
-                }
+            User user = _userRepository.GetUser(Id);
 
-                // blob, queue i sta jos treba
-                User user = new User() 
-                {
-                    Name = Name,
-                    Surname = Surname,
-                    Address = Address,
-                    City = City,
-                    Country = Country,
-                    Phone = Phone,
-                    Email = Email,
-                    Password = Password,
-                    PhotoUrl = "BlobUrl"                    
-                };
+            user.Name = Name;
+            user.Surname = Surname;
+            user.Address = Address;
+            user.City = City;
+            user.Country = Country;
+            user.Phone = Phone;
+            user.Email = Email;
+            user.Password = Password;
+            user.PhotoUrl = "hardcoded";
 
-                _userRepository.AddUsear(user);
-                return RedirectToAction("Index");
-            }
-            catch
-            {
-                return View("Register");
-            }
+            _userRepository.UpdateUser(user);
+
+            return View("Profile", user);
         }
+
+        private User GetUserFromSession()        
+            => (User)HttpContext.Session["user"];            
     }
 }

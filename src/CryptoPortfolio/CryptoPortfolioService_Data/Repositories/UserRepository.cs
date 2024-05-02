@@ -58,6 +58,11 @@ namespace CryptoPortfolioService_Data.Repositories
             return users.Any(user => user.Id == id);
         }
 
+        public bool IsEmailUnique(string email)
+        {
+            return users.Any(user => user.Email == email);
+        }
+
         public void RemoveUser(string id)
         {
             users.Remove(GetUser(id));
@@ -68,7 +73,12 @@ namespace CryptoPortfolioService_Data.Repositories
             return users.FirstOrDefault(user => user.Id == id);
         }
 
-        public void UpdateStudent(User user)
+        public User GetUserByCredentials(string email, string password)
+        {
+            return users.FirstOrDefault(user => user.Email == email && user.Password == password);
+        }
+
+        public void UpdateUser(User user)
         {
             RemoveUser(user.Id);
             AddUsear(user);
