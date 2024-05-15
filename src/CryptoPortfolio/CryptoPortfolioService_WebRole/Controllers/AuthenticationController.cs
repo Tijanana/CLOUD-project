@@ -13,7 +13,6 @@ namespace CryptoPortfolioService_WebRole.Controllers
         //{
         //    return View();
         //}
-
         public ActionResult Login()
         {
             return View();

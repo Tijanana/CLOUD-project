@@ -38,7 +38,7 @@ namespace CryptoPortfolioService_WebRole.Controllers
 
         public ActionResult Portfolio()
         {
-
+            return View();
         }
 
         [HttpPost]
