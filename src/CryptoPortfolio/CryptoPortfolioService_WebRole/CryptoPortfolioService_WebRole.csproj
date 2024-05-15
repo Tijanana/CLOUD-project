@@ -136,10 +136,12 @@
     <Compile Include="Controllers\AuthenticationController.cs" />
     <Compile Include="Controllers\CryptoController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\PortfolioController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
+    <Compile Include="Models\CurrencyDetailsModel.cs" />
     <Compile Include="Models\CurrencyLimitsResponse.cs" />
     <Compile Include="Models\CurrencyPairListItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -202,12 +204,12 @@
     <Content Include="Views\Authentication\Login.cshtml" />
     <Content Include="Views\User\Profile.cshtml" />
     <Content Include="Views\User\EditProfile.cshtml" />
-    <Content Include="Views\User\Portfolio.cshtml" />
-    <Content Include="Views\User\CryptoCurrencies.cshtml" />
+    <Content Include="Views\Crypto\CurrencyDetails.cshtml" />
+    <Content Include="Views\Crypto\CryptoCurrencies.cshtml" />
+    <Content Include="Views\Portfolio\Transactions.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Views\Crypto\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Content\bootstrap.rtl.min.css.map" />
