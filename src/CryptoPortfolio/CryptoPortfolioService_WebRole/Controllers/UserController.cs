@@ -14,6 +14,7 @@ namespace CryptoPortfolioService_WebRole.Controllers
     public class UserController : Controller
     {
         UserRepository _userRepository = new UserRepository();
+        //AlarmRepository _alarmRepository = new AlarmRepository();
         CexIOProvider _cexIoProvider = new CexIOProvider();
         private const string LoginViewPath = "~/Views/Authentication/Login.cshtml";
 
@@ -40,28 +41,50 @@ namespace CryptoPortfolioService_WebRole.Controllers
             return View(user);
         }
 
-        public ActionResult Portfolio()
-        {
-            return View();
-        }
+        //public ActionResult Portfolio()
+        //{
+        //    return View();
+        //}
 
-        public async Task<ActionResult> CryptoCurrencies()
-        {
-            User user = GetUserFromSession();
-            if (user is null)
-                return View(LoginViewPath);
+        //public async Task<ActionResult> CryptoCurrencies()
+        //{
+        //    User user = GetUserFromSession();
+        //    if (user is null)
+        //        return View(LoginViewPath);
 
-            CurrencyLimitsResponse model = await GetCurrencyLimits();
-            List<CurrencyPairListItem> viewModel = new List<CurrencyPairListItem>();
+        //    CurrencyLimitsResponse model = await GetCurrencyLimits();
+        //    List<CurrencyPairListItem> viewModel = new List<CurrencyPairListItem>();
 
-            model.Data.Pairs.ForEach(pairs =>
-            {
-                if (pairs.Symbol1 != "USD" && pairs.Symbol2 == "USD")
-                    viewModel.Add(new CurrencyPairListItem(pairs.Symbol1, pairs.Symbol2, pairs.MinPrice, pairs.MaxPrice));
-            });
+        //    model.Data.Pairs.ForEach(pairs =>
+        //    {
+        //        if (pairs.Symbol1 != "USD" && pairs.Symbol2 == "USD")
+        //            viewModel.Add(new CurrencyPairListItem(pairs.Symbol1, pairs.Symbol2, pairs.MinPrice, pairs.MaxPrice));
+        //    });
 
-            return await Task.Run(() => View(viewModel));
-        }
+        //    return await Task.Run(() => View(viewModel));
+        //}
+
+        //public ActionResult SetAlarm(string symbol1, double alarmValue)
+        //{
+        //    // to do:
+        //    User user = GetUserFromSession();
+        //    if (user is null)
+        //        return View(LoginViewPath);
+
+        //    Alarm alarm = new Alarm();
+        //    alarm.SymbolName = symbol1;
+        //    alarm.AlarmValue = alarmValue;
+        //    alarm.UserId = user.RowKey;
+
+        //    _alarmRepository.AddAlarm(alarm);
+
+        //    return View("Error");
+        //}
+
+        //public ActionResult CurrencyDetails()
+        //{
+        //    return View();
+        //}
 
         [HttpPost]
         public ActionResult ModifyEntity(string RowKey, string Name, string Surname,

@@ -8,11 +8,7 @@ namespace CryptoPortfolioService_WebRole.Controllers
     public class AuthenticationController : Controller
     {
         UserRepository _userRepository = new UserRepository();
-        //// GET: Authentication
-        //public ActionResult Index()
-        //{
-        //    return View();
-        //}
+        
         public ActionResult Login()
         {
             return View();
@@ -55,7 +51,7 @@ namespace CryptoPortfolioService_WebRole.Controllers
             }
             catch
             {
-                return View("Register");
+                return View("Register");    
             }
         }
 

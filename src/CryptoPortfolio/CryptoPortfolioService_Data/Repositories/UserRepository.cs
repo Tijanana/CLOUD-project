@@ -3,7 +3,6 @@ using Microsoft.Azure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 
 namespace CryptoPortfolioService_Data.Repositories
@@ -17,7 +16,7 @@ namespace CryptoPortfolioService_Data.Repositories
         {
             _storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("DataConnectionString"));
             CloudTableClient tableClient = new CloudTableClient(new Uri(_storageAccount.TableEndpoint.AbsoluteUri), _storageAccount.Credentials);
-            _table = tableClient.GetTableReference("StudentTable"); 
+            _table = tableClient.GetTableReference("UserTable"); 
             _table.CreateIfNotExists();
         }
         public IQueryable<User> RetrieveAllUsers()
@@ -27,8 +26,9 @@ namespace CryptoPortfolioService_Data.Repositories
                           select g;
             return results;
         }
+
         public void AddUsear(User newUser)
-        { // Samostalni rad: izmestiti tableName u konfiguraciju servisa. 
+        { 
             TableOperation insertOperation = TableOperation.Insert(newUser);
             _table.Execute(insertOperation);
         }
@@ -40,8 +40,7 @@ namespace CryptoPortfolioService_Data.Repositories
 
         public bool IsEmailUnique(string email)
         {
-            return RetrieveAllUsers().Where(s => s.Email == email).FirstOrDefault() != null;
-            return true;
+            return RetrieveAllUsers().Where(s => s.Email == email).FirstOrDefault() != null;            
         }
 
         public void RemoveUser(string id)
@@ -58,12 +57,7 @@ namespace CryptoPortfolioService_Data.Repositories
         {
             return RetrieveAllUsers().Where(p => p.RowKey == id).FirstOrDefault();
         }
-
-        public User GetUserByEmail(string email)
-        {
-            return new User();
-        }
-
+        
         public User GetUserByCredentials(string email, string password)
         {
             User user = RetrieveAllUsers().Where(p => p.Email == email && p.Password == password).FirstOrDefault();

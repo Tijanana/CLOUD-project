@@ -7,11 +7,11 @@
 
 
 <table border="1">
-    <tr>        
+    <tr>
         <th>Symbol1</th>
         <th>Symbol2</th>
         <th>Min Price</th>
-        <th>Max Price</th>        
+        <th>Max Price</th>
     </tr>
 
     @{
@@ -22,6 +22,7 @@
                 <td>@pairs.Symbol2</td>
                 <td>@pairs.MinPrice</td>
                 <td>@pairs.MaxPrice</td>
+                <td><button><a href="/Crypto/CurrencyDetails?symbol1=@pairs.Symbol1&symbol2=@pairs.Symbol2&minPrice=@pairs.MinPrice&maxPrice=@pairs.MaxPrice">Details</a></button></td>
             </tr>
         }
     }
