@@ -17,7 +17,7 @@ namespace CryptoPortfolioService_WebRole.Controllers
         Class1 classTest = new Class1();
         public async Task<ActionResult> Index()
         {
-            CexIoProvider apiIntegration = new CexIoProvider();
+            CexIOProvider apiIntegration = new CexIOProvider();
             var result = await apiIntegration.MakeGetRequest();
 
             //var x = Deserialize<CryptoCurrencyListItem>(result);

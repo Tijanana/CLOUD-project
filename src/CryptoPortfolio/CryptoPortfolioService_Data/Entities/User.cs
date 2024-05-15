@@ -1,10 +1,11 @@
-﻿using System;
+﻿using Microsoft.WindowsAzure.Storage.Table;
+using System;
 
 namespace CryptoPortfolioService_Data.Entities
 {
-    public class User /*: TableEntity*/
+    public class User : TableEntity
     {
-        public string Id { get; set; } // Id ne treba kod tabele (tada je to rowKey)
+        //public string Id { get; set; } // Id ne treba kod tabele (tada je to rowKey)
         public string Name { get; set; }
         public string Surname { get; set; }
         public string Address { get; set; }
@@ -17,11 +18,12 @@ namespace CryptoPortfolioService_Data.Entities
 
         public User()
         {
-            Id = Guid.NewGuid().ToString();
+            PartitionKey = "User";
+            RowKey = Guid.NewGuid().ToString();
         }
 
-        public User(string id) /*{ PartitionKey = "User"; RowKey = id; }*/
-        {            
-        }
+        //public User(string id) /*{ PartitionKey = "User"; RowKey = id; }*/
+        //{            
+        //}
     }
 }

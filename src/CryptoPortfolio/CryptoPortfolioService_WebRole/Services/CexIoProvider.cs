@@ -1,20 +1,27 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using CryptoPortfolioService_WebRole.Constants;
+using CryptoPortfolioService_WebRole.Models;
+using Newtonsoft.Json;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web;
 
 namespace CryptoPortfolioService_WebRole.Services
 {
-    public class CexIoProvider
+    public class CexIOProvider
     {
         private HttpClient Client { get; set; }
 
-        public CexIoProvider()
+        public CexIOProvider()
         {
             Client = new HttpClient();
+        }
+
+        public async Task<CurrencyLimitsResponse> GetCurrencyLimits()
+        {
+            HttpResponseMessage response = await Client.GetAsync(CexIoUrlConstants.GetLimitsUrl);
+            response.EnsureSuccessStatusCode();
+
+            string responseBody = await response.Content.ReadAsStringAsync();
+            return JsonConvert.DeserializeObject<CurrencyLimitsResponse>(responseBody);
         }
 
         public async Task<object> MakeGetRequest()

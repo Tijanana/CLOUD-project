@@ -31,7 +31,7 @@ namespace CryptoPortfolioService_WebRole.Controllers
         {
             try
             {
-                if (_userRepository.Exists(Email))
+                if (_userRepository.IsEmailUnique(Email))
                 {
                     return View("Error");
                 }
@@ -66,7 +66,7 @@ namespace CryptoPortfolioService_WebRole.Controllers
             if (user is null)
                 return View("Login");
 
-            Session["user"] = user;
+            Session["userRowKey"] = user.RowKey;
             return RedirectToAction("Profile", "User");
         }
     }
