@@ -1,7 +1,9 @@
 ﻿using CryptoPortfolioService_Data.Entities;
 using CryptoPortfolioService_Data.Repositories;
+using CryptoPortfolioService_WebRole.Constants;
 using CryptoPortfolioService_WebRole.Models;
 using CryptoPortfolioService_WebRole.Services;
+using CryptoPortfolioService_WebRole.Utils;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Web.Mvc;
@@ -10,16 +12,17 @@ namespace CryptoPortfolioService_WebRole.Controllers
 {
     public class CryptoController : Controller
     {
-        private const string LoginViewPath = "~/Views/Authentication/Login.cshtml";
-        UserRepository _userRepository = new UserRepository();
+        //private const string LoginViewPath = "~/Views/Authentication/Login.cshtml";
+        ControllerHelperMethods _helpers = new ControllerHelperMethods();
+        //UserRepository _userRepository = new UserRepository();
         TransactionRepository _transactionRepository = new TransactionRepository();
         CexIOProvider _cexIoProvider = new CexIOProvider();
 
         public async Task<ActionResult> CryptoCurrencies()
         {
-            User user = GetUserFromSession();
+            User user = _helpers.GetUserFromSession();
             if (user is null)
-                return View(LoginViewPath);
+                return View(PathConstants.LoginViewPath);
 
             CurrencyLimitsResponse model = await GetCurrencyLimits();
             List<CurrencyPairListItem> viewModel = new List<CurrencyPairListItem>();
@@ -33,22 +36,24 @@ namespace CryptoPortfolioService_WebRole.Controllers
             return await Task.Run(() => View(viewModel));
         }
 
-        public ActionResult CurrencyDetails(string symbol1, string symbol2, string minPrice, string maxPrice)
+        public async Task<ActionResult> CurrencyDetails(string symbol1, string symbol2, string minPrice, string maxPrice)
         {
-            User user = GetUserFromSession();
+            User user = _helpers.GetUserFromSession();
             if (user is null)
-                return View(LoginViewPath);
+                return View(PathConstants.LoginViewPath);
 
-            CurrencyDetailsModel currencyDetails = new CurrencyDetailsModel(symbol1, symbol2, minPrice, maxPrice);
-            return View(currencyDetails);
+            CurrencyLastPriceResponse lastPrice = await GetCurrencyLastPrice(symbol1, symbol2);
+            CurrencyDetailsModel currencyDetails = new CurrencyDetailsModel(symbol1, symbol2, minPrice, maxPrice, lastPrice.LastPrice);
+
+            return await Task.Run(() => View(currencyDetails));            
         }
 
         [HttpPost]
         public ActionResult AddEntity(string Symbol1, int Quantity, double Price)
         {
-            User user = GetUserFromSession();
+            User user = _helpers.GetUserFromSession();
             if (user is null)
-                return View(LoginViewPath);
+                return View(PathConstants.LoginViewPath);
 
             Transaction transaction = new Transaction();
             transaction.CurrencyName = Symbol1;
@@ -59,18 +64,11 @@ namespace CryptoPortfolioService_WebRole.Controllers
             _transactionRepository.AddTransaction(transaction);
 
             return View("Error");
-        }
-
-        private User GetUserFromSession()
-        {
-            string userRowKey = (string)HttpContext.Session["userRowKey"];
-            if (userRowKey == null)
-                return null;
-
-            return _userRepository.GetUser(userRowKey);
-        }
-
+        }        
         private async Task<CurrencyLimitsResponse> GetCurrencyLimits()
             => await _cexIoProvider.GetCurrencyLimits();
+
+        private async Task<CurrencyLastPriceResponse> GetCurrencyLastPrice(string symbol1, string symbol2)
+            => await _cexIoProvider.GetCurrencyLastPrice(symbol1, symbol2);
     }
 }

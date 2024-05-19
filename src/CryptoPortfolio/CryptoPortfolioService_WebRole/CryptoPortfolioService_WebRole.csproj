@@ -133,6 +133,7 @@
     <Compile Include="App_Start\FilterConfig.cs" />
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Constants\CexIoUrlConstants.cs" />
+    <Compile Include="Constants\PathConstants.cs" />
     <Compile Include="Controllers\AuthenticationController.cs" />
     <Compile Include="Controllers\CryptoController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
@@ -142,10 +143,12 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\CurrencyDetailsModel.cs" />
+    <Compile Include="Models\CurrencyLastPriceResponse.cs" />
     <Compile Include="Models\CurrencyLimitsResponse.cs" />
     <Compile Include="Models\CurrencyPairListItem.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\CexIOProvider.cs" />
+    <Compile Include="Utils\ControllerHelperMethods.cs" />
     <Compile Include="WebRole.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -207,6 +210,8 @@
     <Content Include="Views\Crypto\CurrencyDetails.cshtml" />
     <Content Include="Views\Crypto\CryptoCurrencies.cshtml" />
     <Content Include="Views\Portfolio\Transactions.cshtml" />
+    <Content Include="Views\Portfolio\UserCryptoCurrencies.cshtml" />
+    <Content Include="Views\Portfolio\UserCurrencyDetails.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
