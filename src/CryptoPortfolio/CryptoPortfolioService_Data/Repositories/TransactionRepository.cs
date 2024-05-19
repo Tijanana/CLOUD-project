@@ -34,6 +34,11 @@ namespace CryptoPortfolioService_Data.Repositories
             return RetrieveAllTransactions().Where(x => x.UserId == userId).ToList();
         }
 
+        public Transaction RetrieveTransactionForUser(string userId, string transactionId)
+        {
+            return RetrieveAllTransactions().Where(x => x.UserId == userId && x.RowKey == transactionId).FirstOrDefault();
+        }
+
         public void AddTransaction(Transaction newTransaction)
         {
             TableOperation insertOperation = TableOperation.Insert(newTransaction);

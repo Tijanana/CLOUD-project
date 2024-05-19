@@ -19,6 +19,12 @@ namespace CryptoPortfolioService_WebRole.Controllers
             return View();
         }
 
+        public ActionResult Logout()
+        {
+            Session["userRowKey"] = null;
+            return View("Login");
+        }
+
         [HttpPost]
         public ActionResult AddEntity(string Name, string Surname,
                                       string Address, string City, string Country,
@@ -53,7 +59,7 @@ namespace CryptoPortfolioService_WebRole.Controllers
             {
                 return View("Register");    
             }
-        }
+        }        
 
         [HttpPost]
         public ActionResult SetSession(string Email, string Password)

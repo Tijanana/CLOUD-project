@@ -3,15 +3,16 @@ using System;
 
 namespace CryptoPortfolioService_Data.Entities
 {
-    public class Alarm : TableEntity
+    public class CryptoCurrency : TableEntity
     {
         public string UserId { get; set; }
         public string CurrencyName { get; set; }
+        public int Quantity { get; set; }
         public double Profit { get; set; }
 
-        public Alarm()
+        public CryptoCurrency()
         {
-            PartitionKey = "Alarm";
+            PartitionKey = "CryptoCurrency";
             RowKey = Guid.NewGuid().ToString();
         }
     }

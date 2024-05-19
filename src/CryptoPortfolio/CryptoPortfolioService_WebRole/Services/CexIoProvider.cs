@@ -24,29 +24,17 @@ namespace CryptoPortfolioService_WebRole.Services
             return JsonConvert.DeserializeObject<CurrencyLimitsResponse>(responseBody);
         }
 
-        public async Task<object> MakeGetRequest()
+        public async Task<CurrencyLastPriceResponse> GetCurrencyLastPrice(string symbol1, string symbol2)
         {
-            string url = "https://cex.io/api/currency_limits";
-            var result = await GetAsync(url);
+            string url = CexIoUrlConstants.LastPriceUrl;
+            string parameters = $"{symbol1}/{symbol2}";
+            url += parameters;
 
-            return result;
-        }
-
-        public async Task<object> GetAsync(string url)
-        {
             HttpResponseMessage response = await Client.GetAsync(url);
-            
             response.EnsureSuccessStatusCode();
 
-            return await DeserializeObject(response);
-        }
-
-        private async Task<object> DeserializeObject(HttpResponseMessage response)
-        {
             string responseBody = await response.Content.ReadAsStringAsync();
-
-            var result = JsonConvert.DeserializeObject(responseBody);
-            return result;
+            return JsonConvert.DeserializeObject<CurrencyLastPriceResponse>(responseBody);
         }
     }
 }
