@@ -1,5 +1,9 @@
-﻿using CryptoPortfolioService_Data.Entities;
+﻿using CryptoPortfolioService_Data.BlobStorage;
+using CryptoPortfolioService_Data.Entities;
 using CryptoPortfolioService_Data.Repositories;
+using System;
+using System.Drawing;
+using System.IO;
 using System.Web;
 using System.Web.Mvc;
 
@@ -8,6 +12,7 @@ namespace CryptoPortfolioService_WebRole.Controllers
     public class AuthenticationController : Controller
     {
         UserRepository _userRepository = new UserRepository();
+        BlobHelper _blobHelper = new BlobHelper();
         
         public ActionResult Login()
         {
@@ -37,10 +42,23 @@ namespace CryptoPortfolioService_WebRole.Controllers
                 {
                     return View("Error");
                 }
+                if (file == null)
+                {
+                    ViewBag.ErrorMsg = "Profile picture is required.";
+                    return View("Error");
+                }
 
-                // TODO: blob, queue i sta jos treba
+                string generatedUserId = Guid.NewGuid().ToString();
+
+                MemoryStream target = new MemoryStream();
+                file.InputStream.CopyTo(target);
+                byte[] imageByteArray = target.ToArray();
+
+                string blobUri = _blobHelper.UploadProfileImage(generatedUserId, imageByteArray);
+
                 User user = new User()
                 {
+                    RowKey = generatedUserId,
                     Name = Name,
                     Surname = Surname,
                     Address = Address,
@@ -48,10 +66,10 @@ namespace CryptoPortfolioService_WebRole.Controllers
                     Country = Country,
                     Phone = Phone,
                     Email = Email,
-                    Password = Password,
-                    PhotoUrl = "BlobUrl"
-                };
-
+                    Password = Password,                    
+                    PhotoUrl = blobUri
+                };                
+                
                 _userRepository.AddUsear(user);
                 return RedirectToAction("Login");
             }

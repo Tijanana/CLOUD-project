@@ -24,7 +24,7 @@ namespace CryptoPortfolioService_Data.Repositories
         public IQueryable<Transaction> RetrieveAllTransactions()
         {
             var results = from g in _table.CreateQuery<Transaction>()
-                          where g.PartitionKey == "Transaction" 
+                          where g.PartitionKey == "Transaction"
                           select g;
             return results;
         }
@@ -53,6 +53,19 @@ namespace CryptoPortfolioService_Data.Repositories
                 TableOperation deleteOperation = TableOperation.Delete(transaction);
                 _table.Execute(deleteOperation);
             }
+        }
+
+        public bool CanBeDeleted(Transaction transaction)
+        {
+            bool expres = RetrieveAllTransactions()
+                .Where(t => t.CurrencyName == transaction.CurrencyName && t.MadeOn > transaction.MadeOn)
+                .FirstOrDefault() == null;
+
+            Transaction trans = RetrieveAllTransactions()
+                .Where(t => t.CurrencyName == transaction.CurrencyName && t.MadeOn > transaction.MadeOn)
+                .FirstOrDefault();
+
+            return expres;
         }
     }
 }

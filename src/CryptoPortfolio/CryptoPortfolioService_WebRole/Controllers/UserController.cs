@@ -1,9 +1,12 @@
-﻿using CryptoPortfolioService_Data.Entities;
+﻿using CryptoPortfolioService_Data.BlobStorage;
+using CryptoPortfolioService_Data.Entities;
 using CryptoPortfolioService_Data.Repositories;
 using CryptoPortfolioService_WebRole.Constants;
+using CryptoPortfolioService_WebRole.Models;
 using CryptoPortfolioService_WebRole.Services;
 using CryptoPortfolioService_WebRole.Utils;
 using System;
+using System.IO;
 using System.Web;
 using System.Web.Mvc;
 
@@ -12,12 +15,42 @@ namespace CryptoPortfolioService_WebRole.Controllers
     public class UserController : Controller
     {
         ControllerHelperMethods _helpers = new ControllerHelperMethods();
-        UserRepository _userRepository = new UserRepository();                
-        //private const string LoginViewPath = "~/Views/Authentication/Login.cshtml";
-
-        public ActionResult Index()
+        UserRepository _userRepository = new UserRepository();
+        BlobHelper _blobHelper = new BlobHelper();
+        
+        public ActionResult ChangePicture()
         {
-            return View(_userRepository.RetrieveAllUsers()); // ne treba nam ova metoda (test da li radi)
+            User user = _helpers.GetUserFromSession();
+            if (user is null)
+                return View(PathConstants.LoginViewPath);
+
+            byte[] imageBytes = _blobHelper.DownloadImageToByteArray(user.RowKey);
+            ImageModel imageModel = new ImageModel() { ImageBytes = imageBytes };
+
+            return View(imageModel);
+        }
+
+        [HttpPost]
+        public ActionResult UpdateBlob(HttpPostedFileBase file)
+        {
+            User user = _helpers.GetUserFromSession();
+            if (user is null)
+                return View(PathConstants.LoginViewPath);
+
+            if (file == null)
+            {
+                ViewBag.ErrorMsg = "Profile picture is required.";
+                return View("Error");
+            }
+
+            MemoryStream target = new MemoryStream();
+            file.InputStream.CopyTo(target);
+            byte[] imageByteArray = target.ToArray();
+
+            user.PhotoUrl = _blobHelper.UploadProfileImage(user.RowKey, imageByteArray);            
+            _userRepository.UpdateUser(user);
+
+            return RedirectToAction("Profile");
         }
 
         public ActionResult Profile()
@@ -26,7 +59,12 @@ namespace CryptoPortfolioService_WebRole.Controllers
             if (user is null)
                 return View(PathConstants.LoginViewPath);
 
-            return View(user);
+            byte[] imageBytes = _blobHelper.DownloadImageToByteArray(user.RowKey);
+
+            UserProfileModel userProfileModel = new UserProfileModel(user);
+            userProfileModel.ImageBytes = imageBytes;            
+
+            return View(userProfileModel);
         }
 
         public ActionResult EditProfile()

@@ -4,15 +4,14 @@ using CryptoPortfolioService_Data.Repositories;
 using CryptoPortfolioService_WebRole.Constants;
 using CryptoPortfolioService_WebRole.Utils;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web.Mvc;
 
 namespace CryptoPortfolioService_WebRole.Controllers
 {
     public class PortfolioController : Controller
-    {
-        //private const string LoginViewPath = "~/Views/Authentication/Login.cshtml";
-        ControllerHelperMethods _helpers = new ControllerHelperMethods();
-        //UserRepository _userRepository = new UserRepository();
+    {        
+        ControllerHelperMethods _helpers = new ControllerHelperMethods();     
         TransactionRepository _transactionRepository = new TransactionRepository();
         CryptoCurrencyRepository _cryptoCurrencyRepository = new CryptoCurrencyRepository();
         AlarmRepository _alarmRepository = new AlarmRepository();
@@ -73,7 +72,8 @@ namespace CryptoPortfolioService_WebRole.Controllers
                 return View(PathConstants.LoginViewPath);
 
             List<Transaction> transactions = _transactionRepository.RetrieveAllTransactionsForUser(user.RowKey);
-            return View(transactions);
+            List<Transaction> orderedTransactions = transactions.OrderBy(x => x.MadeOn).ToList();
+            return View(orderedTransactions);
         }
 
         public ActionResult DeleteTransaction(string id)
@@ -81,10 +81,15 @@ namespace CryptoPortfolioService_WebRole.Controllers
             User user = _helpers.GetUserFromSession();
             if (user is null)
                 return View(PathConstants.LoginViewPath);
-
+            
             Transaction transaction = _transactionRepository.RetrieveTransactionForUser(user.RowKey, id);
-            DeleteOrUpdateCryptoCurrencyEntity(transaction, user.RowKey);
+            if (!_transactionRepository.CanBeDeleted(transaction))
+            {
+                ViewBag.ErrorMsg = "Only the last transaction for a specific currency can be deleted";
+                return View("Error");
+            }
 
+            DeleteOrUpdateCryptoCurrencyEntity(transaction, user.RowKey);
             _transactionRepository.RemoveTransaction(id);
            
             return RedirectToAction("Transactions");
