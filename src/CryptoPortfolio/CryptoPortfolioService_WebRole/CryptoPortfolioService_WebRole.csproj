@@ -146,6 +146,8 @@
     <Compile Include="Models\CurrencyLastPriceResponse.cs" />
     <Compile Include="Models\CurrencyLimitsResponse.cs" />
     <Compile Include="Models\CurrencyPairListItem.cs" />
+    <Compile Include="Models\ImageModel.cs" />
+    <Compile Include="Models\UserProfileModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\CexIOProvider.cs" />
     <Compile Include="Utils\ControllerHelperMethods.cs" />
@@ -212,6 +214,7 @@
     <Content Include="Views\Portfolio\Transactions.cshtml" />
     <Content Include="Views\Portfolio\UserCryptoCurrencies.cshtml" />
     <Content Include="Views\Portfolio\UserCurrencyDetails.cshtml" />
+    <Content Include="Views\User\ChangePicture.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
