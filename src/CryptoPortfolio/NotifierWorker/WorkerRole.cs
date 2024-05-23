@@ -71,7 +71,7 @@ namespace NotifierWorker
                 var alarms = _alarmRepository.GetTopAlarms();
                 foreach (var alarm in alarms)
                 {
-                    var isActive = CheckIfAlarmIsActive(alarm);
+                    var isActive = IsAlarmActive(alarm);
 
                     if (isActive)
                     {
@@ -83,7 +83,7 @@ namespace NotifierWorker
             }
         }
 
-        private bool CheckIfAlarmIsActive(Alarm alarm)
+        private bool IsAlarmActive(Alarm alarm)
         {
             var cryptoCurrency = _cryptoCurrencyRepository.RetrieveCurrencyForUser(alarm.CurrencyName, alarm.UserId);
             if (cryptoCurrency == null)
