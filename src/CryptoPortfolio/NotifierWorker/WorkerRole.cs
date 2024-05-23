@@ -1,3 +1,5 @@
+using CryptoPortfolioService_Data.Entities;
+using CryptoPortfolioService_Data.Repositories;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Diagnostics;
 using Microsoft.WindowsAzure.ServiceRuntime;
@@ -15,6 +17,8 @@ namespace NotifierWorker
     {
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         private readonly ManualResetEvent runCompleteEvent = new ManualResetEvent(false);
+        private AlarmRepository _alarmRepository = new AlarmRepository();
+        private CryptoCurrencyRepository _cryptoCurrencyRepository = new CryptoCurrencyRepository();
 
         public override void Run()
         {
@@ -62,12 +66,36 @@ namespace NotifierWorker
 
         private async Task RunAsync(CancellationToken cancellationToken)
         {
-            // TODO: Replace the following with your own logic.
             while (!cancellationToken.IsCancellationRequested)
             {
-                Trace.TraceInformation("Working");
-                await Task.Delay(1000);
+                var alarms = _alarmRepository.GetTopAlarms();
+                foreach (var alarm in alarms)
+                {
+                    var isActive = CheckIfAlarmIsActive(alarm);
+
+                    if (isActive)
+                    {
+                        await EmailSender.SendNotificationEmail(alarm);
+                    }
+                }
+
+                await Task.Delay(10000);
             }
+        }
+
+        private bool CheckIfAlarmIsActive(Alarm alarm)
+        {
+            var cryptoCurrency = _cryptoCurrencyRepository.RetrieveCurrencyForUser(alarm.CurrencyName, alarm.UserId);
+            if (cryptoCurrency == null)
+            {
+                return false;
+            }
+
+            if (cryptoCurrency.Profit >= alarm.Profit)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

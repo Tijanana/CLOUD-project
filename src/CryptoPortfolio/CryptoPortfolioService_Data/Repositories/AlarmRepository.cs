@@ -3,6 +3,8 @@ using Microsoft.Azure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace CryptoPortfolioService_Data.Repositories
 {
@@ -23,6 +25,12 @@ namespace CryptoPortfolioService_Data.Repositories
         {
             TableOperation insertOperation = TableOperation.Insert(newAlarm);
             _table.Execute(insertOperation);
+        }
+
+        public List<Alarm> GetTopAlarms(int count = 20)
+        {
+            var query = new TableQuery<Alarm>().Take(count);
+            return _table.ExecuteQuery(query).ToList();
         }
     }
 }
