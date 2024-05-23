@@ -61,6 +61,7 @@
     <Compile Include="Entities\Transaction.cs" />
     <Compile Include="Entities\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueueStorage\NotificationQueueManager.cs" />
     <Compile Include="Repositories\AlarmRepository.cs" />
     <Compile Include="Repositories\CryptoCurrencyRepository.cs" />
     <Compile Include="Repositories\TransactionRepository.cs" />
