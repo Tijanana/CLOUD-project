@@ -56,6 +56,7 @@
   <ItemGroup>
     <Compile Include="BlobStorage\BlobHelper.cs" />
     <Compile Include="Entities\Alarm.cs" />
+    <Compile Include="Entities\AlarmNotification.cs" />
     <Compile Include="Entities\CryptoCurrency.cs" />
     <Compile Include="Entities\Enums\TransactionType.cs" />
     <Compile Include="Entities\Transaction.cs" />

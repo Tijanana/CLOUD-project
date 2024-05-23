@@ -1,4 +1,5 @@
 using CryptoPortfolioService_Data.Entities;
+using CryptoPortfolioService_Data.QueueStorage;
 using CryptoPortfolioService_Data.Repositories;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Diagnostics;
@@ -19,6 +20,7 @@ namespace NotifierWorker
         private readonly ManualResetEvent runCompleteEvent = new ManualResetEvent(false);
         private AlarmRepository _alarmRepository = new AlarmRepository();
         private CryptoCurrencyRepository _cryptoCurrencyRepository = new CryptoCurrencyRepository();
+        private NotificationQueueManager _notificationQueueManager = new NotificationQueueManager();
 
         public override void Run()
         {
@@ -69,13 +71,33 @@ namespace NotifierWorker
             while (!cancellationToken.IsCancellationRequested)
             {
                 var alarms = _alarmRepository.GetTopAlarms();
+                var sentAlarmIds = new List<string>();
+
                 foreach (var alarm in alarms)
                 {
                     var isActive = IsAlarmActive(alarm);
 
                     if (isActive)
                     {
-                        await EmailSender.SendNotificationEmail(alarm);
+                        bool emailSent = await EmailSender.SendNotificationEmail(alarm);
+                        if (emailSent)
+                        {
+                            sentAlarmIds.Add(alarm.RowKey); // Assuming RowKey is the unique identifier for the alarm
+                        }
+                    }
+                }
+
+                // Call PersistAlarmNotification to persist information about completed alarm notifications
+                foreach (var sentAlarmId in sentAlarmIds)
+                {
+                    bool notificationPersisted = await _notificationQueueManager.PersistAlarmNotification(DateTime.UtcNow, sentAlarmId, 1); // Assuming 1 email sent per alarm
+                    if (notificationPersisted)
+                    {
+                        Trace.TraceInformation($"Notification for alarm with RowKey {sentAlarmId} persisted successfully.");
+                    }
+                    else
+                    {
+                        Trace.TraceError($"Failed to persist notification for alarm with RowKey {sentAlarmId}.");
                     }
                 }
 
