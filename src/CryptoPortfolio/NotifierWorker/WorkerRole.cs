@@ -68,7 +68,7 @@ namespace NotifierWorker
 
         private async Task RunAsync(CancellationToken cancellationToken)
         {
-            // EnterTestDataNotificationService();
+            EnterTestDataNotificationService();
 
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -104,6 +104,11 @@ namespace NotifierWorker
                     {
                         Trace.TraceError($"Failed to persist notification for alarm with RowKey {sentAlarmId}.");
                     }
+                }
+
+                if (sentAlarmIds.Count > 0)
+                {
+                    await _notificationQueueManager.AddAlarmIdsToQueue(sentAlarmIds);
                 }
 
                 await Task.Delay(10000);

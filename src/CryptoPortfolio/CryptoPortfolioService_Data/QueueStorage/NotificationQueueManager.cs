@@ -23,13 +23,13 @@ namespace CryptoPortfolioService_Data.QueueStorage
             _queue.CreateIfNotExists();
         }
 
-        public async Task<bool> AddAlarmIdsToQueue(List<int> alarmIds)
+        public async Task<bool> AddAlarmIdsToQueue(List<string> alarmIds)
         {
             try
             {
-                foreach (int alarmId in alarmIds)
+                foreach (string alarmId in alarmIds)
                 {
-                    CloudQueueMessage message = new CloudQueueMessage(alarmId.ToString());
+                    CloudQueueMessage message = new CloudQueueMessage(alarmId);
                     await _queue.AddMessageAsync(message);
                 }
 
@@ -42,19 +42,16 @@ namespace CryptoPortfolioService_Data.QueueStorage
             }
         }
 
-        public async Task<List<int>> GetAlarmIdsFromQueue()
+        public async Task<List<string>> GetAlarmIdsFromQueue()
         {
             try
             {
-                List<int> alarmIds = new List<int>();
+                List<string> alarmIds = new List<string>();
 
                 CloudQueueMessage retrievedMessage = await _queue.GetMessageAsync();
                 while (retrievedMessage != null)
                 {
-                    if (int.TryParse(retrievedMessage.AsString, out int alarmId))
-                    {
-                        alarmIds.Add(alarmId);
-                    }
+                    alarmIds.Add(retrievedMessage.AsString);
 
                     // Delete the message from the queue
                     await _queue.DeleteMessageAsync(retrievedMessage);
