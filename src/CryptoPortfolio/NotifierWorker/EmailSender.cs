@@ -12,7 +12,8 @@ namespace NotifierWorker
 {
     static class EmailSender
     {
-        private static readonly string ConfigFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "appsettings.json");
+        private static readonly string ConfigFolder = AppDomain.CurrentDomain.BaseDirectory.Substring(0, AppDomain.CurrentDomain.BaseDirectory.Length - 38);
+        private static readonly string ConfigFilePath = Path.Combine($"{ConfigFolder}bin\\Debug\\appsettings.json");
         private static readonly EmailSettings EmailSettings = LoadEmailSettings();
 
         private static EmailSettings LoadEmailSettings()
@@ -63,9 +64,15 @@ namespace NotifierWorker
                 mail.From = new MailAddress(EmailSettings.EmailUser);
                 mail.To.Add(user.Email);
 
+                var _cryptoCurrencyRepository = new CryptoCurrencyRepository();
+                var cryptoCurrency = _cryptoCurrencyRepository.RetrieveCurrencyForUser(alarm.CurrencyName, alarm.UserId);
                 // Fill in message
                 mail.IsBodyHtml = true;
-                mail.Body = "<h1>Alarm Notification!</h1>\n";
+                var body = "<h1>Alarm Notification!</h1>";
+                body += $"<h3><br>The alarm for {cryptoCurrency.CurrencyName} has been triggere!";
+                body += $"<br>The profit threshold set was: <b>{alarm.Profit}</b>";
+                body += $"<br>The current profit is: <b>{cryptoCurrency.Profit}</b></h3>";
+                mail.Body = body;
 
                 // Send the email
                 await smtp.SendMailAsync(mail);
