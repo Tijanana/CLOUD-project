@@ -8,6 +8,7 @@ namespace CryptoPortfolioService_Data.Entities
         public string UserId { get; set; }
         public string CurrencyName { get; set; }
         public double Profit { get; set; }
+        public bool IsTriggered { get; set; }
 
         public Alarm()
         {
