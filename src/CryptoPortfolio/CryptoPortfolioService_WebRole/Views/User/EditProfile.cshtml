@@ -57,12 +57,17 @@
         @Html.EditorFor(model => model.Email) @Html.ValidationMessageFor(model => model.Email)
     </div>
     <div class="editor-label">
-        @Html.LabelFor(model => model.Password)
+        <label>Old password</label>
     </div>
     <div class="editor-field">
-        @Html.EditorFor(model => model.Password) @Html.ValidationMessageFor(model => model.Password)
+        <input type="password" name="OldPassword" />
+    </div>    
+    <div>
+        <label>New Password</label>
     </div>
-    <input type="file" id="userPicture" name="file" />
+    <div>
+        <input type="password" name="NewPassword"/>
+    </div>    
     <p>
         <input type="submit" value="Modify" />
     </p>

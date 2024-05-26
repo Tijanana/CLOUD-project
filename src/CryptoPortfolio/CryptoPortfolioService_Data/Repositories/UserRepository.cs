@@ -69,5 +69,10 @@ namespace CryptoPortfolioService_Data.Repositories
             TableOperation updateOperation = TableOperation.Replace(user);
             _table.Execute(updateOperation);
         }
+
+        public bool IsPasswordValid(string email, string password)
+        {
+            return RetrieveAllUsers().Where(s => s.Email == email && s.Password == password).FirstOrDefault() != null;
+        }
     }
 }

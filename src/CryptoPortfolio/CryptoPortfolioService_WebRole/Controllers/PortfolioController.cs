@@ -2,6 +2,7 @@
 using CryptoPortfolioService_Data.Entities.Enums;
 using CryptoPortfolioService_Data.Repositories;
 using CryptoPortfolioService_WebRole.Constants;
+using CryptoPortfolioService_WebRole.Services;
 using CryptoPortfolioService_WebRole.Utils;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,12 @@ namespace CryptoPortfolioService_WebRole.Controllers
             User user = _helpers.GetUserFromSession();
             if (user is null)
                 return View(PathConstants.LoginViewPath);
+
+            if (!Validator.ValidateTransaction(Quantity, Price))
+            {
+                ViewBag.ErrorMsg = $"Invalid request.";
+                return View("Error");
+            }
 
             Transaction transaction = new Transaction();
             transaction.CurrencyName = CurrencyName;
@@ -84,7 +91,7 @@ namespace CryptoPortfolioService_WebRole.Controllers
                 return View(PathConstants.LoginViewPath);
             
             Transaction transaction = _transactionRepository.RetrieveTransactionForUser(user.RowKey, id);
-            if (!_transactionRepository.CanBeDeleted(transaction))
+            if (!_transactionRepository.CanBeDeleted(transaction, user.RowKey))
             {
                 ViewBag.ErrorMsg = "Only the last transaction for a specific currency can be deleted";
                 return View("Error");
@@ -150,18 +157,11 @@ namespace CryptoPortfolioService_WebRole.Controllers
         {
             CryptoCurrency cryptoCurrency = _cryptoCurrencyRepository.RetrieveCurrencyForUser(transaction.CurrencyName, userId);
             if (transaction.TransactionType == TransactionType.BUYING.ToString())
-            {
-                if (cryptoCurrency.Quantity == transaction.Quantity)
-                {
-                    _cryptoCurrencyRepository.RemoveCryptoCurrency(cryptoCurrency.RowKey);
-                }
-                else
-                {
-                    cryptoCurrency.Quantity -= transaction.Quantity;
-                    cryptoCurrency.Profit += transaction.PricePerUnit * transaction.Quantity;
+            {                
+                cryptoCurrency.Quantity -= transaction.Quantity;
+                cryptoCurrency.Profit += transaction.PricePerUnit * transaction.Quantity;
 
-                    _cryptoCurrencyRepository.UpdateCryptoCurrency(cryptoCurrency);
-                }
+                _cryptoCurrencyRepository.UpdateCryptoCurrency(cryptoCurrency);                
             }
             else
             {

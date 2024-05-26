@@ -104,7 +104,7 @@ namespace NotificationService_WorkerRole
                     await _notificationQueueManager.AddAlarmIdsToQueue(sentAlarmIds);
                 }
 
-                await Task.Delay(100000);
+                await Task.Delay(1000000);
             }
         }
 

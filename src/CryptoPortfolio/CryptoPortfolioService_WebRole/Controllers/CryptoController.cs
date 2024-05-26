@@ -11,10 +11,8 @@ using System.Web.Mvc;
 namespace CryptoPortfolioService_WebRole.Controllers
 {
     public class CryptoController : Controller
-    {
-        //private const string LoginViewPath = "~/Views/Authentication/Login.cshtml";
-        ControllerHelperMethods _helpers = new ControllerHelperMethods();
-        //UserRepository _userRepository = new UserRepository();
+    {        
+        ControllerHelperMethods _helpers = new ControllerHelperMethods();        
         TransactionRepository _transactionRepository = new TransactionRepository();
         CexIOProvider _cexIoProvider = new CexIOProvider();
 
@@ -54,6 +52,12 @@ namespace CryptoPortfolioService_WebRole.Controllers
             User user = _helpers.GetUserFromSession();
             if (user is null)
                 return View(PathConstants.LoginViewPath);
+
+            if (!Validator.ValidateTransaction(Quantity, Price))
+            {
+                ViewBag.ErrorMsg = $"Invalid request.";
+                return View("Error");
+            }
 
             Transaction transaction = new Transaction();
             transaction.CurrencyName = Symbol1;

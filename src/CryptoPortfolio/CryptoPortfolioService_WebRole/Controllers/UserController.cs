@@ -79,13 +79,28 @@ namespace CryptoPortfolioService_WebRole.Controllers
         [HttpPost]
         public ActionResult ModifyEntity(string RowKey, string Name, string Surname,
                                          string Address, string City, string Country,
-                                         string Phone, string Email, string Password,
-                                         HttpPostedFileBase file)
+                                         string Phone, string Email, string OldPassword, string NewPassword)
         {
             try
             {
                 if (!_userRepository.Exists(RowKey))
                 {
+                    return View("Error");
+                }                
+
+                User currentUser = _helpers.GetUserFromSession();
+                if (currentUser is null)
+                    return View(PathConstants.LoginViewPath);
+
+                if (!_userRepository.IsPasswordValid(currentUser.Email, OldPassword))
+                {
+                    ViewBag.ErrorMsg = "Incorrect password";
+                    return View("Error");
+                }
+
+                if (!Validator.ValidateUser(Name, Surname, Address, City, Country, Phone, NewPassword))
+                {
+                    ViewBag.ErrorMsg = "One or more fields is not valid.";
                     return View("Error");
                 }
 
@@ -98,12 +113,12 @@ namespace CryptoPortfolioService_WebRole.Controllers
                 user.Country = Country;
                 user.Phone = Phone;
                 user.Email = Email;
-                user.Password = Password;
+                user.Password = NewPassword;
                 user.PhotoUrl = "hardcoded";
 
                 _userRepository.UpdateUser(user);
 
-                return View("Profile", user);
+                return RedirectToAction("Profile");
             }
             catch (Exception e)
             {

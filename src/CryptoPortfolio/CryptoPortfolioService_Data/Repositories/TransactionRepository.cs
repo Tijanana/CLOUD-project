@@ -55,14 +55,14 @@ namespace CryptoPortfolioService_Data.Repositories
             }
         }
 
-        public bool CanBeDeleted(Transaction transaction)
+        public bool CanBeDeleted(Transaction transaction, string userId)
         {
             bool expres = RetrieveAllTransactions()
-                .Where(t => t.CurrencyName == transaction.CurrencyName && t.MadeOn > transaction.MadeOn)
+                .Where(t => t.CurrencyName == transaction.CurrencyName && t.UserId == userId && t.Timestamp > transaction.Timestamp)
                 .FirstOrDefault() == null;
 
             Transaction trans = RetrieveAllTransactions()
-                .Where(t => t.CurrencyName == transaction.CurrencyName && t.MadeOn > transaction.MadeOn)
+                .Where(t => t.CurrencyName == transaction.CurrencyName && t.UserId == userId && t.Timestamp > transaction.Timestamp)
                 .FirstOrDefault();
 
             return expres;
