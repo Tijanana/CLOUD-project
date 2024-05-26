@@ -47,12 +47,22 @@
       <RoleName>CryptoPortfolioService_WebRole</RoleName>
       <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
     </ProjectReference>
+    <ProjectReference Include="..\NotificationService_WorkerRole\NotificationService_WorkerRole.csproj">
+      <Name>NotificationService_WorkerRole</Name>
+      <Project>{530986b7-6c14-4f30-be21-ae1d3241e001}</Project>
+      <Private>True</Private>
+      <RoleType>Worker</RoleType>
+      <RoleName>NotificationService_WorkerRole</RoleName>
+      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="CryptoPortfolioService_WebRoleContent\" />
+    <Folder Include="NotificationService_WorkerRoleContent\" />
   </ItemGroup>
   <ItemGroup>
     <DiagnosticsConfiguration Include="CryptoPortfolioService_WebRoleContent\diagnostics.wadcfgx" />
+    <DiagnosticsConfiguration Include="NotificationService_WorkerRoleContent\diagnostics.wadcfgx" />
   </ItemGroup>
   <!-- Import the target files for this project template -->
   <PropertyGroup>

@@ -1,6 +1,7 @@
 ﻿using CryptoPortfolioService_Data.BlobStorage;
 using CryptoPortfolioService_Data.Entities;
 using CryptoPortfolioService_Data.Repositories;
+using CryptoPortfolioService_WebRole.Services;
 using System;
 using System.Drawing;
 using System.IO;
@@ -45,6 +46,11 @@ namespace CryptoPortfolioService_WebRole.Controllers
                 if (file == null)
                 {
                     ViewBag.ErrorMsg = "Profile picture is required.";
+                    return View("Error");
+                }
+                if(!Validator.ValidateUser(Name, Surname, Address, City, Country, Phone, Password))
+                {
+                    ViewBag.ErrorMsg = "One or more fields is not valid.";
                     return View("Error");
                 }
 

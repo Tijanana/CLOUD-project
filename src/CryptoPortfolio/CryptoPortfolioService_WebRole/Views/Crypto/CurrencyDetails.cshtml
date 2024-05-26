@@ -5,7 +5,7 @@
 
 <h2>CurrencyDetails</h2>
 
-<table border="1">
+<table class="table">
     <tr>
         <th>Symbol1</th>
         <th>Symbol2</th>
@@ -23,7 +23,7 @@
 </table>
 
 <form action="~/Portfolio/AddTransactionEntity" method="post">
-    <table>
+    <table class="table">
         <tr hidden>
             <td>Symbol1</td>
             <td><input type="text" name="currencyName" value="@Model.Symbol1" /></td>
