@@ -7,6 +7,13 @@
       <Setting name="DataConnectionString" value="UseDevelopmentStorage=true" />
     </ConfigurationSettings>
   </Role>
+  <Role name="NotificationService_WorkerRole">
+    <Instances count="1" />
+    <ConfigurationSettings>
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" value="UseDevelopmentStorage=true" />
+      <Setting name="DataConnectionString" value="UseDevelopmentStorage=true" />
+    </ConfigurationSettings>
+  </Role>
   <NetworkConfiguration>
     <VirtualNetworkSite name="cryptoportfolioserviceVNet" />
     <AddressAssignments>
