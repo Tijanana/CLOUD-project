@@ -8,11 +8,11 @@ using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 
-namespace NotifierWorker
+namespace CryptoPortfolioService_NotificationService
 {
-    static class EmailSender
+    class EmailSender : IEmailSender
     {
-        private static readonly string ConfigFolder = AppDomain.CurrentDomain.BaseDirectory.Substring(0, AppDomain.CurrentDomain.BaseDirectory.Length - 38);
+        private static readonly string ConfigFolder = AppDomain.CurrentDomain.BaseDirectory.Substring(0, AppDomain.CurrentDomain.BaseDirectory.Length - 66);
         private static readonly string ConfigFilePath = Path.Combine($"{ConfigFolder}bin\\Debug\\appsettings.json");
         private static readonly EmailSettings EmailSettings = LoadEmailSettings();
 
@@ -25,18 +25,18 @@ namespace NotifierWorker
             }
             catch (Exception ex)
             {
-                Trace.WriteLine($"An error occurred when trying to read the configuration file: {ex.Message}");
+                Trace.WriteLine($"[NOTIFICATION SERVICE]: An error occurred when trying to read the configuration file: {ex.Message}");
                 return null;
             }
         }
 
-        public static async Task<bool> SendNotificationEmail(Alarm alarm)
+        public async Task<bool> SendNotificationEmail(Alarm alarm)
         {
             try
             {
                 if (EmailSettings == null)
                 {
-                    Trace.WriteLine("An error occurred when trying to send email:\n\tFailed to read email settings from configuration file!");
+                    Trace.WriteLine("[NOTIFICATION SERVICE]: An error occurred when trying to send email:\n\tFailed to read email settings from configuration file!");
                     return false;
                 }
 
@@ -44,7 +44,7 @@ namespace NotifierWorker
                 User user = _userRepository.GetUser(alarm.UserId);
                 if (user == null)
                 {
-                    Trace.WriteLine("An error occurred when trying to send email:\n\tUser not found!");
+                    Trace.WriteLine("[NOTIFICATION SERVICE]: An error occurred when trying to send email:\n\tUser not found!");
                     return false;
                 }
 
@@ -80,7 +80,7 @@ namespace NotifierWorker
             }
             catch (Exception ex)
             {
-                Trace.WriteLine($"An error occurred when trying to send email: {ex.Message}");
+                Trace.WriteLine($"[NOTIFICATION SERVICE]: An error occurred when trying to send email: {ex.Message}");
                 return false;
             }
         }

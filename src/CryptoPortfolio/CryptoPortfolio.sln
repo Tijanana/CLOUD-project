@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 17
-VisualStudioVersion = 17.9.34728.123
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.34902.97
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "CryptoPortfolioService", "CryptoPortfolioService\CryptoPortfolioService.ccproj", "{8803145B-453C-4937-8122-D2611809C3F6}"
 EndProject
@@ -9,9 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoPortfolioService_WebR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoPortfolioService_Data", "CryptoPortfolioService_Data\CryptoPortfolioService_Data.csproj", "{A83D41AC-7A98-4AC6-9018-8128A6296B3F}"
 EndProject
-Project("{CC5FD16D-436D-48AD-A40C-5A424C6E3E79}") = "NotificationService", "NotificationService\NotificationService.ccproj", "{0F0A05EA-8E13-4EEE-944B-98A5AB1E47A1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotifierWorker", "NotifierWorker\NotifierWorker.csproj", "{DA3A70EA-3D57-4AA0-AD41-5D5457020A97}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoPortfolioService_NotificationService", "CryptoPortfolioService_NotificationService\CryptoPortfolioService_NotificationService.csproj", "{C7B7858A-0E06-4880-9F0F-328D72FF3371}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,14 +29,10 @@ Global
 		{A83D41AC-7A98-4AC6-9018-8128A6296B3F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A83D41AC-7A98-4AC6-9018-8128A6296B3F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A83D41AC-7A98-4AC6-9018-8128A6296B3F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0F0A05EA-8E13-4EEE-944B-98A5AB1E47A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0F0A05EA-8E13-4EEE-944B-98A5AB1E47A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0F0A05EA-8E13-4EEE-944B-98A5AB1E47A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0F0A05EA-8E13-4EEE-944B-98A5AB1E47A1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DA3A70EA-3D57-4AA0-AD41-5D5457020A97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DA3A70EA-3D57-4AA0-AD41-5D5457020A97}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DA3A70EA-3D57-4AA0-AD41-5D5457020A97}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DA3A70EA-3D57-4AA0-AD41-5D5457020A97}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7B7858A-0E06-4880-9F0F-328D72FF3371}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7B7858A-0E06-4880-9F0F-328D72FF3371}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7B7858A-0E06-4880-9F0F-328D72FF3371}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7B7858A-0E06-4880-9F0F-328D72FF3371}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

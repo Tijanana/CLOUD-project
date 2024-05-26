@@ -1,10 +1,12 @@
 ﻿using CryptoPortfolioService_Data.Entities;
 using Microsoft.Azure;
 using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.WindowsAzure.Storage.Queue;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace CryptoPortfolioService_Data.Repositories
@@ -12,34 +14,44 @@ namespace CryptoPortfolioService_Data.Repositories
     public class AlarmRepository
     {
         private CloudStorageAccount _storageAccount;
-        private CloudTable _table;
+        private CloudQueue _queue;
 
         public AlarmRepository()
         {
             _storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("DataConnectionString"));
-            CloudTableClient tableClient = new CloudTableClient(new Uri(_storageAccount.TableEndpoint.AbsoluteUri), _storageAccount.Credentials);
-            _table = tableClient.GetTableReference("AlarmTable");
-            _table.CreateIfNotExists();
+            CloudQueueClient queueClient = _storageAccount.CreateCloudQueueClient();
+            _queue = queueClient.GetQueueReference("alarmqueue");
+            _queue.CreateIfNotExists();
         }
 
-        public void AddAlarm(Alarm newAlarm)
+        public async Task AddAlarmAsync(Alarm newAlarm)
         {
-            TableOperation insertOperation = TableOperation.Insert(newAlarm);
-            _table.Execute(insertOperation);
+            string alarmMessage = JsonConvert.SerializeObject(newAlarm);
+            CloudQueueMessage message = new CloudQueueMessage(alarmMessage);
+            await _queue.AddMessageAsync(message);
         }
 
-        public List<Alarm> GetTopAlarms(int count = 20)
+        public async Task<List<Alarm>> GetTopAlarmsAsync(int count = 20)
         {
-            var query = new TableQuery<Alarm>()
-                .Where(TableQuery.GenerateFilterConditionForBool("IsTriggered", QueryComparisons.Equal, false))
-                .Take(20);
-            return _table.ExecuteQuery(query).ToList();
+            Thread.Sleep(new Random().Next(0, 10000)); // Ensures no two instances can get the same data because of timing
+            var messages = await _queue.GetMessagesAsync(count);
+            var alarms = new List<Alarm>();
+
+            foreach (var message in messages)
+            {
+                var alarm = JsonConvert.DeserializeObject<Alarm>(message.AsString);
+                alarms.Add(alarm);
+                await _queue.DeleteMessageAsync(message); // Delete the message from the queue
+            }
+
+            return alarms;
         }
 
-        public async Task UpdateAlarm(Alarm alarm)
+        public async Task RequeueAlarmAsync(Alarm alarm)
         {
-            var operation = TableOperation.Replace(alarm);
-            await _table.ExecuteAsync(operation);
+            string alarmMessage = JsonConvert.SerializeObject(alarm);
+            CloudQueueMessage message = new CloudQueueMessage(alarmMessage);
+            await _queue.AddMessageAsync(message);
         }
     }
 }

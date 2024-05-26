@@ -14,6 +14,7 @@
     <StartDevelopmentStorage>True</StartDevelopmentStorage>
     <ARMDeployment>True</ARMDeployment>
     <Name>CryptoPortfolioService</Name>
+    <UseWebProjectPorts>False</UseWebProjectPorts>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -39,6 +40,14 @@
     <ServiceConfiguration Include="ServiceConfiguration.Cloud.cscfg" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\CryptoPortfolioService_NotificationService\CryptoPortfolioService_NotificationService.csproj">
+      <Name>CryptoPortfolioService_NotificationService</Name>
+      <Project>{c7b7858a-0e06-4880-9f0f-328d72ff3371}</Project>
+      <Private>True</Private>
+      <RoleType>Worker</RoleType>
+      <RoleName>CryptoPortfolioService_NotificationService</RoleName>
+      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
+    </ProjectReference>
     <ProjectReference Include="..\CryptoPortfolioService_WebRole\CryptoPortfolioService_WebRole.csproj">
       <Name>CryptoPortfolioService_WebRole</Name>
       <Project>{5ea6406d-952b-46cc-87ef-12f81be8a410}</Project>
@@ -49,9 +58,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="CryptoPortfolioService_NotificationServiceContent\" />
     <Folder Include="CryptoPortfolioService_WebRoleContent\" />
   </ItemGroup>
   <ItemGroup>
+    <DiagnosticsConfiguration Include="CryptoPortfolioService_NotificationServiceContent\diagnostics.wadcfgx" />
     <DiagnosticsConfiguration Include="CryptoPortfolioService_WebRoleContent\diagnostics.wadcfgx" />
   </ItemGroup>
   <!-- Import the target files for this project template -->

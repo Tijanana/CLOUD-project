@@ -61,7 +61,7 @@ namespace CryptoPortfolioService_WebRole.Controllers
             alarm.Profit = profit;
             alarm.UserId = user.RowKey;
 
-            _alarmRepository.AddAlarm(alarm);
+            _alarmRepository.AddAlarmAsync(alarm);
             return RedirectToAction("UserCryptoCurrencies");
         }
 

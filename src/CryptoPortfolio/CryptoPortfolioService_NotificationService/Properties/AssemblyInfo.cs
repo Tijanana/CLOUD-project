@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("NotifierWorker")]
+[assembly: AssemblyTitle("CryptoPortfolioService_NotificationService")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("NotifierWorker")]
+[assembly: AssemblyProduct("CryptoPortfolioService_NotificationService")]
 [assembly: AssemblyCopyright("Copyright ©  2024")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("da3a70ea-3d57-4aa0-ad41-5d5457020a97")]
+[assembly: Guid("c7b7858a-0e06-4880-9f0f-328d72ff3371")]
 
 // Version information for an assembly consists of the following four values:
 //
