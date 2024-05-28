@@ -10,38 +10,33 @@ using System.Threading.Tasks;
 
 namespace NotificationService_WorkerRole
 {
-    public static class EmailSender
+    class EmailSender : IEmailSender
     {
-        private static readonly string ConfigFolder = AppDomain.CurrentDomain.BaseDirectory.Substring(0, AppDomain.CurrentDomain.BaseDirectory.Length - 38);
-        private static readonly string ConfigFilePath = Path.Combine($"{ConfigFolder}\\appsettings.json");
+        private static readonly string ConfigFolder = AppDomain.CurrentDomain.BaseDirectory.Substring(0, AppDomain.CurrentDomain.BaseDirectory.Length - 77);
+        private static readonly string ConfigFilePath = Path.Combine($"{ConfigFolder}NotificationService_WorkerRole\\bin\\Debug\\appsettings.json");
         private static readonly EmailSettings EmailSettings = LoadEmailSettings();
 
         private static EmailSettings LoadEmailSettings()
         {
             try
-            {                
-                EmailSettings emailSettings = new EmailSettings() 
-                { 
-                    AppPassword = "wgmrzjdbnfcbpsdl",
-                    EmailUser = "feedback.requests.info@gmail.com" 
-                };
-
-                return emailSettings;
+            {
+                string json = File.ReadAllText(ConfigFilePath);
+                return JsonConvert.DeserializeObject<EmailSettings>(json);
             }
             catch (Exception ex)
             {
-                Trace.WriteLine($"An error occurred when trying to read the configuration file: {ex.Message}");
+                Trace.WriteLine($"[NOTIFICATION SERVICE]: An error occurred when trying to read the configuration file: {ex.Message}");
                 return null;
             }
         }
 
-        public static async Task<bool> SendNotificationEmail(Alarm alarm)
+        public async Task<bool> SendNotificationEmail(Alarm alarm)
         {
             try
             {
                 if (EmailSettings == null)
                 {
-                    Trace.WriteLine("An error occurred when trying to send email:\n\tFailed to read email settings from configuration file!");
+                    Trace.WriteLine("[NOTIFICATION SERVICE]: An error occurred when trying to send email:\n\tFailed to read email settings from configuration file!");
                     return false;
                 }
 
@@ -49,7 +44,7 @@ namespace NotificationService_WorkerRole
                 User user = _userRepository.GetUser(alarm.UserId);
                 if (user == null)
                 {
-                    Trace.WriteLine("An error occurred when trying to send email:\n\tUser not found!");
+                    Trace.WriteLine("[NOTIFICATION SERVICE]: An error occurred when trying to send email:\n\tUser not found!");
                     return false;
                 }
 
@@ -71,6 +66,7 @@ namespace NotificationService_WorkerRole
 
                 var _cryptoCurrencyRepository = new CryptoCurrencyRepository();
                 var cryptoCurrency = _cryptoCurrencyRepository.RetrieveCurrencyForUser(alarm.CurrencyName, alarm.UserId);
+
                 // Fill in message
                 mail.IsBodyHtml = true;
                 var body = "<h1>Alarm Notification!</h1>";
@@ -78,6 +74,7 @@ namespace NotificationService_WorkerRole
                 body += $"<br>The profit threshold set was: <b>{alarm.Profit}</b>";
                 body += $"<br>The current profit is: <b>{cryptoCurrency.Profit}</b></h3>";
                 mail.Body = body;
+                mail.Subject = $"{cryptoCurrency.CurrencyName} alarm activated";
 
                 // Send the email
                 await smtp.SendMailAsync(mail);
@@ -85,7 +82,7 @@ namespace NotificationService_WorkerRole
             }
             catch (Exception ex)
             {
-                Trace.WriteLine($"An error occurred when trying to send email: {ex.Message}");
+                Trace.WriteLine($"[NOTIFICATION SERVICE]: An error occurred when trying to send email: {ex.Message}");
                 return false;
             }
         }
