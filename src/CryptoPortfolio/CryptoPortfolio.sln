@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CryptoPortfolioService_Data
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService_WorkerRole", "NotificationService_WorkerRole\NotificationService_WorkerRole.csproj", "{530986B7-6C14-4F30-BE21-AE1D3241E001}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthMonitoringService_WorkerRole", "HealthMonitoringService_WorkerRole\HealthMonitoringService_WorkerRole.csproj", "{37BBBA39-6E2D-475B-89DB-D308796B1747}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{530986B7-6C14-4F30-BE21-AE1D3241E001}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{530986B7-6C14-4F30-BE21-AE1D3241E001}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{530986B7-6C14-4F30-BE21-AE1D3241E001}.Release|Any CPU.Build.0 = Release|Any CPU
+		{37BBBA39-6E2D-475B-89DB-D308796B1747}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{37BBBA39-6E2D-475B-89DB-D308796B1747}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{37BBBA39-6E2D-475B-89DB-D308796B1747}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{37BBBA39-6E2D-475B-89DB-D308796B1747}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
