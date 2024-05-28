@@ -3,6 +3,7 @@ using Microsoft.Azure;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
 using System;
+using System.Diagnostics;
 using System.Linq;
 
 namespace CryptoPortfolioService_Data.Repositories
@@ -23,35 +24,43 @@ namespace CryptoPortfolioService_Data.Repositories
         public IQueryable<HealthCheck> RetrieveAllHealthChecks()
         {
             var results = from g in _table.CreateQuery<HealthCheck>()
+                          where g.PartitionKey == "HealthCheck"
                           select g;
             return results;
         }
 
         public void AddHealthCheck(HealthCheck newHealthCheck)
         {
-            TableOperation insertOperation = TableOperation.Insert(newHealthCheck);
-            _table.Execute(insertOperation);
-        }
-
-        public bool Exists(string endpoint, DateTime timestamp)
-        {
-            string rowKey = timestamp.ToString("o");
-            return RetrieveAllHealthChecks().Where(s => s.PartitionKey == endpoint && s.RowKey == rowKey).FirstOrDefault() != null;
-        }
-
-        public void RemoveHealthCheck(string endpoint, DateTime timestamp)
-        {
-            HealthCheck healthCheck = RetrieveAllHealthChecks().Where(s => s.PartitionKey == endpoint && s.RowKey == timestamp.ToString("o")).FirstOrDefault();
-            if (healthCheck != null)
+            try
             {
-                TableOperation deleteOperation = TableOperation.Delete(healthCheck);
-                _table.Execute(deleteOperation);
+                TableOperation insertOperation = TableOperation.Insert(newHealthCheck);
+                _table.Execute(insertOperation);
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine($"[HEALTH MONITORING SERVICE]: An error occurred when trying to add new Health Check:\n{ex.Message}");
             }
         }
 
-        public HealthCheck GetHealthCheck(string endpoint, DateTime timestamp)
+        public IQueryable<HealthCheck> GetLatestHealthChecks(string service)
         {
-            return RetrieveAllHealthChecks().Where(p => p.PartitionKey == endpoint && p.RowKey == timestamp.ToString("o")).FirstOrDefault();
+            // Define the time threshold for the last 24 hours
+            DateTime threshold = DateTime.UtcNow.Subtract(TimeSpan.FromHours(24));
+
+            // Create a query filter to retrieve health checks for the specified service and within the last 24 hours
+            string partitionFilter = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "HealthCheck");
+            string serviceFilter = TableQuery.GenerateFilterCondition("Service", QueryComparisons.Equal, service);
+            string timestampFilter = TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.GreaterThanOrEqual, threshold);
+
+            // Combine the filters using the 'And' operator
+            string combinedFilter = TableQuery.CombineFilters(partitionFilter, TableOperators.And, serviceFilter);
+            combinedFilter = TableQuery.CombineFilters(combinedFilter, TableOperators.And, timestampFilter);
+
+            // Create a query using the filter
+            TableQuery<HealthCheck> query = new TableQuery<HealthCheck>().Where(combinedFilter);
+
+            // Execute the query and return the results
+            return _table.ExecuteQuery(query).AsQueryable();
         }
 
         public void UpdateHealthCheck(HealthCheck healthCheck)

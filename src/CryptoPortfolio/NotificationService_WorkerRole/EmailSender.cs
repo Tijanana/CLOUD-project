@@ -10,13 +10,22 @@ using System.Threading.Tasks;
 
 namespace NotificationService_WorkerRole
 {
-    class EmailSender : IEmailSender
+    public class EmailSender : IEmailSender
     {
-        private static readonly string ConfigFolder = AppDomain.CurrentDomain.BaseDirectory.Substring(0, AppDomain.CurrentDomain.BaseDirectory.Length - 77);
-        private static readonly string ConfigFilePath = Path.Combine($"{ConfigFolder}NotificationService_WorkerRole\\bin\\Debug\\appsettings.json");
-        private static readonly EmailSettings EmailSettings = LoadEmailSettings();
+        public int NumberOfCharactersToRemove { get; set; }
+        public string ConfigFolder { get; set; }
+        public string ConfigFilePath { get; set; }
+        private EmailSettings EmailSettings { get; set; }
 
-        private static EmailSettings LoadEmailSettings()
+        public EmailSender(int numberOfCharactersToRemove)
+        {
+            NumberOfCharactersToRemove = numberOfCharactersToRemove;
+            ConfigFolder = AppDomain.CurrentDomain.BaseDirectory.Substring(0, AppDomain.CurrentDomain.BaseDirectory.Length - NumberOfCharactersToRemove);
+            ConfigFilePath = Path.Combine($"{ConfigFolder}NotificationService_WorkerRole\\bin\\Debug\\appsettings.json");
+            EmailSettings = LoadEmailSettings();
+        }
+
+        private EmailSettings LoadEmailSettings()
         {
             try
             {
@@ -25,7 +34,7 @@ namespace NotificationService_WorkerRole
             }
             catch (Exception ex)
             {
-                Trace.WriteLine($"[NOTIFICATION SERVICE]: An error occurred when trying to read the configuration file: {ex.Message}");
+                Trace.WriteLine($"[EMAIL SENDER]: An error occurred when trying to read the configuration file: {ex.Message}");
                 return null;
             }
         }

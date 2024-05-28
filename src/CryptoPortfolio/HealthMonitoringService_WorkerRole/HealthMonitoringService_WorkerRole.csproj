@@ -32,8 +32,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Azure.KeyVault.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
-      <HintPath>..\packages\Microsoft.Azure.KeyVault.Core.1.0.0\lib\net40\Microsoft.Azure.KeyVault.Core.dll</HintPath>
+	  <Reference Include="Microsoft.Azure.KeyVault.Core, Version=1.0.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
+		  <HintPath>..\packages\Microsoft.Azure.KeyVault.Core.1.0.0\lib\net40\Microsoft.Azure.KeyVault.Core.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.WindowsAzure.Diagnostics, Version=2.8.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35">
       <Private>True</Private>
@@ -103,6 +103,10 @@
     <ProjectReference Include="..\CryptoPortfolioService_Data\CryptoPortfolioService_Data.csproj">
       <Project>{A83D41AC-7A98-4AC6-9018-8128A6296B3F}</Project>
       <Name>CryptoPortfolioService_Data</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\NotificationService_WorkerRole\NotificationService_WorkerRole.csproj">
+      <Project>{530986b7-6c14-4f30-be21-ae1d3241e001}</Project>
+      <Name>NotificationService_WorkerRole</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

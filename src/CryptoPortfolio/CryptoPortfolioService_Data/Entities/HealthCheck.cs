@@ -9,14 +9,14 @@ namespace CryptoPortfolioService_Data.Entities
 {
     public class HealthCheck : TableEntity
     {
-        public HealthCheck() { }
-
-        public HealthCheck(string endpoint, DateTime timestamp)
+        public HealthCheck()
         {
-            PartitionKey = endpoint;
-            RowKey = timestamp.ToString("o"); // ISO 8601 format
+            PartitionKey = "HealthCheck";
+            RowKey = DateTime.UtcNow.ToString("o"); // ISO 8601 format
         }
 
         public string Status { get; set; }
+        public string Service { get; set; }
+        public DateTime Timestamp { get; set; }
     }
 }

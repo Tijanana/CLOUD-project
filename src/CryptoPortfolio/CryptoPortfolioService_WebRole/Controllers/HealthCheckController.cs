@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -18,6 +19,7 @@ namespace CryptoPortfolioService_WebRole.Controllers
             // Return an appropriate response based on the health status
             if (isHealthy)
             {
+                Trace.TraceError($"[CRYPTO PORTFOLIO]: Responded OK to health check");
                 return Content("OK", "text/plain");
             }
             else

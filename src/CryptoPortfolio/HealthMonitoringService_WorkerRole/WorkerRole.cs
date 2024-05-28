@@ -5,6 +5,7 @@ using System.Threading;
 using CryptoPortfolioService_Data.Entities;
 using CryptoPortfolioService_Data.Repositories;
 using Microsoft.WindowsAzure.ServiceRuntime;
+using NotificationService_WorkerRole;
 
 namespace HealthMonitoringService_WorkerRole
 {
@@ -42,13 +43,13 @@ namespace HealthMonitoringService_WorkerRole
                 if (!response.IsSuccessStatusCode)
                 {
                     status = "NOT_OK";
-                    SendAlertEmail(endpoint);
+                    SendAlertEmail(endpoint, timestamp);
                 }
             }
             catch (Exception)
             {
                 status = "NOT_OK";
-                SendAlertEmail(endpoint);
+                SendAlertEmail(endpoint, timestamp);
             }
 
             LogHealthCheck(endpoint, timestamp, status);
@@ -56,17 +57,20 @@ namespace HealthMonitoringService_WorkerRole
 
         private void LogHealthCheck(string endpoint, DateTime timestamp, string status)
         {
-            var healthCheck = new HealthCheck(endpoint, timestamp)
+            var healthCheck = new HealthCheck()
             {
-                Status = status
+                Status = status,
+                Service = endpoint.Contains("PortfolioService") ? "Portfolio Service" : "Notification Service",
+                Timestamp = timestamp
             };
 
             healthCheckRepository.AddHealthCheck(healthCheck);
         }
 
-        private void SendAlertEmail(string endpoint)
+        private async void SendAlertEmail(string endpoint, DateTime timestamp)
         {
-            // Implement email sending logic here (e.g., using SendGrid or SMTP)
+            EmailSender emailSender = new EmailSender(81);
+            await emailSender.SendAlertEmail(endpoint, timestamp);
         }
 
         public override bool OnStart()

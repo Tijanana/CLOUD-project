@@ -21,7 +21,7 @@ namespace NotificationService_WorkerRole
         private AlarmRepository _alarmRepository = new AlarmRepository();
         private CryptoCurrencyRepository _cryptoCurrencyRepository = new CryptoCurrencyRepository();
         private NotificationQueueManager _notificationQueueManager = new NotificationQueueManager();
-        private EmailSender _emailSender = new EmailSender();
+        private EmailSender _emailSender = new EmailSender(77);
         private readonly string healthCheckEndpoint = "http://localhost:8080/NotificationService/health-monitoring";
 
         public override void Run()
