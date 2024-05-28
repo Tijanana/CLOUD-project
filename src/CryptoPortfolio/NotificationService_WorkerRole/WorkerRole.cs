@@ -21,7 +21,7 @@ namespace NotificationService_WorkerRole
         private AlarmRepository _alarmRepository = new AlarmRepository();
         private CryptoCurrencyRepository _cryptoCurrencyRepository = new CryptoCurrencyRepository();
         private NotificationQueueManager _notificationQueueManager = new NotificationQueueManager();
-        private EmailSender _emailSender = new EmailSender();
+        private EmailSender _emailSender = new EmailSender(77);
 
         public override void Run()
         {

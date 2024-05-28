@@ -1,4 +1,5 @@
 ﻿using CryptoPortfolioService_Data.Entities;
+using System;
 using System.ServiceModel;
 using System.Threading.Tasks;
 
@@ -9,5 +10,8 @@ namespace NotificationService_WorkerRole
     {
         [OperationContract]
         Task<bool> SendNotificationEmail(Alarm alarm);
+
+        [OperationContract]
+        Task<bool> SendAlertEmail(string endpoint, DateTime timestamp);
     }
 }
