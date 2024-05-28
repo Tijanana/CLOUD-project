@@ -14,7 +14,7 @@ namespace HealthMonitoringService_WorkerRole
         private static readonly HttpClient httpClient = new HttpClient();
         private readonly string[] endpoints = {
             "http://localhost:80/PortfolioService/health-monitoring",
-            "http://localhost:80/NotificationService/health-monitoring"
+            "http://localhost:8080/NotificationService/health-monitoring"
         };
 
         public override void Run()
