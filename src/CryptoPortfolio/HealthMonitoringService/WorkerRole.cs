@@ -1,10 +1,12 @@
 using CryptoPortfolioService_Data.Entities;
+using CryptoPortfolioService_Data.Repositories;
 using Microsoft.Azure;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Diagnostics;
 using Microsoft.WindowsAzure.ServiceRuntime;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
+// using NotificationService_WorkerRole;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,6 +23,8 @@ namespace HealthMonitoringService
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         private readonly ManualResetEvent runCompleteEvent = new ManualResetEvent(false);
         public List<ServiceConnection> serviceConnections { get; set; } = new List<ServiceConnection>();
+        public HealthCheckRepository healthCheckRepository = new HealthCheckRepository();
+        // public EmailSender emailSender = new EmailSender(70);
 
         public override void Run()
         {
@@ -71,7 +75,7 @@ namespace HealthMonitoringService
             serviceConnections = await GetNotificationServiceHealthCheckEndpointsAsync();
             var webRoleServiceConnection = new ServiceConnection()
             {
-                Endpoint = "http://localhost:80/PortfolioService/HealthCheck/Check",
+                Endpoint = "http://localhost/HealthCheck/Check",
                 Service = "WebRole",
                 Instance = "0"
             };
@@ -83,14 +87,33 @@ namespace HealthMonitoringService
                 foreach (var serviceConnection in serviceConnections)
                 {
                     bool isHealthy = await CheckHealthAsync(serviceConnection.Endpoint);
+                    var status = isHealthy ? "OK" : "NOT OK";
+                    var healthCheck = new HealthCheck()
+                    {
+                        Status = status,
+                        Service = serviceConnection.Service,
+                        Instance = serviceConnection.Instance,
+                        Timestamp = DateTime.UtcNow
+                    };
+
                     if (isHealthy)
                     {
-                        Trace.TraceInformation($"{serviceConnection.Service}[{serviceConnection.Instance}] is healthy.");
+                        Trace.TraceInformation($"{serviceConnection.Service}[{serviceConnection.Instance}]: OK.");
                     }
                     else
                     {
-                        Trace.TraceInformation($"{serviceConnection.Service}[{serviceConnection.Instance}] is healthy.");
+                        Trace.TraceInformation($"{serviceConnection.Service}[{serviceConnection.Instance}]: NOT OK.");
+                        // var sentAlert = await emailSender.SendAlertEmail(healthCheck);
+                        /*if (sentAlert)
+                        {
+                            Trace.WriteLine($"[HEALTH MONITORING SERVICE]: Alerted failure of {healthCheck.Service}");
+                        }
+                        else
+                        {
+                            Trace.WriteLine($"[HEALTH MONITORING SERVICE]: An error occurred when trying to send email");
+                        }*/
                     }
+                    healthCheckRepository.AddHealthCheck(healthCheck);
                 }
 
                 Thread.Sleep(new Random().Next(1000, 5000));

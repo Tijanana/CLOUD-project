@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace NotificationService_WorkerRole
 {
-    class EmailSender : IEmailSender
+    public class EmailSender : IEmailSender
     {
         public int NumberOfCharactersToRemove { get; set; }
         public string ConfigFolder { get; set; }
@@ -96,7 +96,7 @@ namespace NotificationService_WorkerRole
             }
         }
 
-        public async Task<bool> SendAlertEmail(string endpoint, DateTime timestamp)
+        public async Task<bool> SendAlertEmail(HealthCheck healthCheck)
         {
             try
             {
@@ -125,14 +125,12 @@ namespace NotificationService_WorkerRole
                 // Fill in message
                 mail.IsBodyHtml = true;
                 var body = "<h1>Healt Alert!</h1>";
-                var service = endpoint.Contains("PortfolioService") ? "Portfolio Service" : "Notification Service";
-                body += $"<h3><br>Detected failure of the {service} at {timestamp.Date} : {timestamp.TimeOfDay.ToString("hh\\:mm\\:ss")}!";
+                body += $"<h3><br>Detected failure of the {healthCheck.Service} at {healthCheck.Timestamp.Date} : {healthCheck.Timestamp.TimeOfDay.ToString("hh\\:mm\\:ss")}!";
                 mail.Body = body;
                 mail.Subject = $"Health Alert";
 
                 // Send the email
-                await smtp.SendMailAsync(mail);
-                Trace.WriteLine($"[HEALTH MONITORING SERVICE]: Alerted failure of {service}");
+                await smtp.SendMailAsync(mail);;
                 return true;
             }
             catch (Exception ex)

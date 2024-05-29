@@ -12,6 +12,6 @@ namespace NotificationService_WorkerRole
         Task<bool> SendNotificationEmail(Alarm alarm);
 
         [OperationContract]
-        Task<bool> SendAlertEmail(string endpoint, DateTime timestamp);
+        Task<bool> SendAlertEmail(HealthCheck healthCheck);
     }
 }
