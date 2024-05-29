@@ -56,6 +56,7 @@ namespace NotificationService_WorkerRole
 
             // Initialize health check listener
             InitializeHealthCheckListener();
+
             // Register the health check endpoint
             RegisterHealthCheckEndpoint();
 
@@ -70,9 +71,6 @@ namespace NotificationService_WorkerRole
 
             this.cancellationTokenSource.Cancel();
             this.runCompleteEvent.WaitOne();
-
-            // Unregister the health check endpoint
-            UnregisterHealthCheckEndpoint();
 
             base.OnStop();
 
@@ -155,26 +153,6 @@ namespace NotificationService_WorkerRole
             table.Execute(insertOrReplaceOperation);
 
             Trace.TraceInformation($"Registered health check endpoint: {healthCheckEndpoint}");
-        }
-
-        private void UnregisterHealthCheckEndpoint()
-        {
-            var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("DataConnectionString"));
-            var tableClient = storageAccount.CreateCloudTableClient();
-            var table = tableClient.GetTableReference("HealthCheckEndpoints");
-
-            var instanceId = RoleEnvironment.CurrentRoleInstance.Id;
-            var deleteOperation = TableOperation.Delete(new EndpointEntity("NotificationService", instanceId) { ETag = "*" });
-
-            try
-            {
-                table.Execute(deleteOperation);
-                Trace.TraceInformation($"Unregistered health check endpoint for instance: {instanceId}");
-            }
-            catch (StorageException ex)
-            {
-                Trace.TraceError($"Error unregistering health check endpoint: {ex.Message}");
-            }
         }
 
         private async Task RunAsync(CancellationToken cancellationToken)

@@ -20,6 +20,7 @@ namespace HealthMonitoringService
     {
         private readonly CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
         private readonly ManualResetEvent runCompleteEvent = new ManualResetEvent(false);
+        public List<ServiceConnection> serviceConnections { get; set; } = new List<ServiceConnection>();
 
         public override void Run()
         {
@@ -67,20 +68,20 @@ namespace HealthMonitoringService
 
         private async Task RunAsync(CancellationToken cancellationToken)
         {
+            serviceConnections = await GetHealthCheckEndpointsAsync();
+
             while (!cancellationToken.IsCancellationRequested)
             {
-                var endpoints = await GetHealthCheckEndpointsAsync();
-
-                foreach (var endpoint in endpoints)
+                foreach (var serviceConnection in serviceConnections)
                 {
-                    bool isHealthy = await CheckHealthAsync(endpoint);
+                    bool isHealthy = await CheckHealthAsync(serviceConnection.Endpoint);
                     if (isHealthy)
                     {
-                        Trace.TraceInformation($"Instance at {endpoint} is healthy.");
+                        Trace.TraceInformation($"{serviceConnection.Service}[{serviceConnection.Instance}] is healthy.");
                     }
                     else
                     {
-                        Trace.TraceWarning($"Instance at {endpoint} is not healthy.");
+                        Trace.TraceInformation($"{serviceConnection.Service}[{serviceConnection.Instance}] is healthy.");
                     }
                 }
 
@@ -88,9 +89,9 @@ namespace HealthMonitoringService
             }
         }
 
-        private async Task<List<string>> GetHealthCheckEndpointsAsync()
+        private async Task<List<ServiceConnection>> GetHealthCheckEndpointsAsync()
         {
-            var endpoints = new List<string>();
+            var endpoints = new List<ServiceConnection>();
 
             var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("DataConnectionString"));
             var tableClient = storageAccount.CreateCloudTableClient();
@@ -99,9 +100,22 @@ namespace HealthMonitoringService
             var query = new TableQuery<EndpointEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "NotificationService"));
             var results = await table.ExecuteQuerySegmentedAsync(query, null);
 
-            foreach (var entity in results.Results)
+            // Sort results by Timestamp in descending order and take the top 3
+            var lastThreeEntries = results.Results
+                                          .OrderByDescending(e => e.Timestamp)
+                                          .Take(3)
+                                          .ToList();
+
+            int index = 0;
+            foreach (var entity in lastThreeEntries)
             {
-                endpoints.Add(entity.Url);
+                endpoints.Add(new ServiceConnection()
+                {
+                    Endpoint = entity.Url,
+                    Service = "NotificationService",
+                    Instance = index.ToString()
+                });
+                index++;
             }
 
             return endpoints;
@@ -123,5 +137,12 @@ namespace HealthMonitoringService
                 return false;
             }
         }
+    }
+
+    public class ServiceConnection
+    {
+        public string Endpoint { get; set; }
+        public string Service { get; set; }
+        public string Instance { get; set; }
     }
 }
