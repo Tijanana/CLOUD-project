@@ -30,9 +30,6 @@ namespace NotificationService_WorkerRole
 
             try
             {
-                // Start listening for health check requests
-                ListenForHealthCheck();
-
                 this.RunAsync(this.cancellationTokenSource.Token).Wait();
             }
             finally
@@ -54,10 +51,8 @@ namespace NotificationService_WorkerRole
 
             bool result = base.OnStart();
 
-            // Get the instance ID and dynamic port
-            string instanceId = RoleEnvironment.CurrentRoleInstance.Id;
-            int port = RoleEnvironment.CurrentRoleInstance.InstanceEndpoints["HttpEndpoint"].IPEndpoint.Port;
-            healthCheckEndpoint = $"http://{RoleEnvironment.CurrentRoleInstance.InstanceEndpoints["HttpEndpoint"].IPEndpoint.Address}:{port}/NotificationService/{instanceId}/health-monitoring";
+            // Initialize health check listener
+            InitializeHealthCheckListener();
 
             Trace.TraceInformation($"NotificationService_WorkerRole has been started with health check endpoint {healthCheckEndpoint}");
 
@@ -76,23 +71,42 @@ namespace NotificationService_WorkerRole
             Trace.TraceInformation("NotificationService_WorkerRole has stopped");
         }
 
+        private void InitializeHealthCheckListener()
+        {
+            // This method initializes the health check listener for the role instance
+            Task.Run(() => ListenForHealthCheck());
+        }
+
         private void ListenForHealthCheck()
         {
-            // Start listening for health check requests
-            Task.Run(async () =>
-            {
-                using (var listener = new HttpListener())
-                {
-                    listener.Prefixes.Add(healthCheckEndpoint + "/");
-                    listener.Start();
+            var endpoint = RoleEnvironment.CurrentRoleInstance.InstanceEndpoints["HttpEndpoint"];
+            var prefix = $"http://{endpoint.IPEndpoint.Address}:{endpoint.IPEndpoint.Port}/health-monitoring/";
 
-                    while (true)
-                    {
-                        var context = await listener.GetContextAsync();
-                        ThreadPool.QueueUserWorkItem(o => HandleHealthCheckRequest(context));
-                    }
+            // Use a dynamically assigned port to avoid conflicts
+            string dynamicPrefix = GetDynamicPrefix();
+
+            using (var listener = new HttpListener())
+            {
+                listener.Prefixes.Add(dynamicPrefix);
+                listener.Start();
+
+                Trace.TraceInformation($"Listening for health check requests at: {dynamicPrefix}");
+
+                while (true)
+                {
+                    var context = listener.GetContext();
+                    ThreadPool.QueueUserWorkItem(o => HandleHealthCheckRequest(context));
                 }
-            });
+            }
+        }
+
+        private string GetDynamicPrefix()
+        {
+            var endpoint = RoleEnvironment.CurrentRoleInstance.InstanceEndpoints["HttpEndpoint"];
+            var dynamicPort = endpoint.IPEndpoint.Port;
+            var prefix = $"http://{endpoint.IPEndpoint.Address}:{dynamicPort}/health-monitoring/";
+
+            return prefix;
         }
 
         private void HandleHealthCheckRequest(HttpListenerContext context)
