@@ -31,4 +31,20 @@
       <Setting name="DataConnectionString" />
     </ConfigurationSettings>
   </WorkerRole>
+  <WebRole name="HealthStatusService_WebRole" vmsize="Standard_D1_v2">
+    <Sites>
+      <Site name="Web">
+        <Bindings>
+          <Binding name="Endpoint1" endpointName="Endpoint2" />
+        </Bindings>
+      </Site>
+    </Sites>
+    <ConfigurationSettings>
+      <Setting name="Microsoft.WindowsAzure.Plugins.Diagnostics.ConnectionString" />
+      <Setting name="DataConnectionString" />
+    </ConfigurationSettings>
+    <Endpoints>
+      <InputEndpoint name="Endpoint2" protocol="http" port="8082" />
+    </Endpoints>
+  </WebRole>
 </ServiceDefinition>

@@ -64,5 +64,17 @@ namespace CryptoPortfolioService_Data.Repositories
             // Execute the query and return the results
             return _table.ExecuteQuery(query).AsQueryable();
         }
+
+        public IQueryable<HealthCheck> GetHealthChecksForLastHour()
+        {
+            DateTime oneHourAgo = DateTime.UtcNow.Subtract(TimeSpan.FromHours(1));
+            string partitionFilter = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "HealthCheck");
+            string timestampFilter = TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.GreaterThanOrEqual, oneHourAgo);
+
+            string combinedFilter = TableQuery.CombineFilters(partitionFilter, TableOperators.And, timestampFilter);
+
+            TableQuery<HealthCheck> query = new TableQuery<HealthCheck>().Where(combinedFilter);
+            return _table.ExecuteQuery(query).AsQueryable();
+        }
     }
 }
