@@ -1,9 +1,12 @@
 using CryptoPortfolioService_Data.Entities;
 using CryptoPortfolioService_Data.Queue;
 using CryptoPortfolioService_Data.Repositories;
+using Microsoft.Azure;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Diagnostics;
 using Microsoft.WindowsAzure.ServiceRuntime;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -53,6 +56,8 @@ namespace NotificationService_WorkerRole
 
             // Initialize health check listener
             InitializeHealthCheckListener();
+            // Register the health check endpoint
+            RegisterHealthCheckEndpoint();
 
             Trace.TraceInformation($"NotificationService_WorkerRole has been started with health check endpoint {healthCheckEndpoint}");
 
@@ -65,6 +70,9 @@ namespace NotificationService_WorkerRole
 
             this.cancellationTokenSource.Cancel();
             this.runCompleteEvent.WaitOne();
+
+            // Unregister the health check endpoint
+            UnregisterHealthCheckEndpoint();
 
             base.OnStop();
 
@@ -79,11 +87,9 @@ namespace NotificationService_WorkerRole
 
         private void ListenForHealthCheck()
         {
-            var endpoint = RoleEnvironment.CurrentRoleInstance.InstanceEndpoints["HttpEndpoint"];
-            var prefix = $"http://{endpoint.IPEndpoint.Address}:{endpoint.IPEndpoint.Port}/health-monitoring/";
-
             // Use a dynamically assigned port to avoid conflicts
             string dynamicPrefix = GetDynamicPrefix();
+            healthCheckEndpoint = dynamicPrefix;
 
             using (var listener = new HttpListener())
             {
@@ -129,6 +135,45 @@ namespace NotificationService_WorkerRole
                 Trace.TraceError($"[NOTIFICATION SERVICE]: Error handling health check request: {ex.Message}");
                 context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
                 context.Response.Close();
+            }
+        }
+        private void RegisterHealthCheckEndpoint()
+        {
+            // Register this URL in Azure Table Storage
+            var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("DataConnectionString"));
+            var tableClient = storageAccount.CreateCloudTableClient();
+            var table = tableClient.GetTableReference("HealthCheckEndpoints");
+            table.CreateIfNotExists();
+
+            var instanceId = RoleEnvironment.CurrentRoleInstance.Id;
+            var endpointEntity = new EndpointEntity("NotificationService", instanceId)
+            {
+                Url = healthCheckEndpoint
+            };
+
+            var insertOrReplaceOperation = TableOperation.InsertOrReplace(endpointEntity);
+            table.Execute(insertOrReplaceOperation);
+
+            Trace.TraceInformation($"Registered health check endpoint: {healthCheckEndpoint}");
+        }
+
+        private void UnregisterHealthCheckEndpoint()
+        {
+            var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("DataConnectionString"));
+            var tableClient = storageAccount.CreateCloudTableClient();
+            var table = tableClient.GetTableReference("HealthCheckEndpoints");
+
+            var instanceId = RoleEnvironment.CurrentRoleInstance.Id;
+            var deleteOperation = TableOperation.Delete(new EndpointEntity("NotificationService", instanceId) { ETag = "*" });
+
+            try
+            {
+                table.Execute(deleteOperation);
+                Trace.TraceInformation($"Unregistered health check endpoint for instance: {instanceId}");
+            }
+            catch (StorageException ex)
+            {
+                Trace.TraceError($"Error unregistering health check endpoint: {ex.Message}");
             }
         }
 
