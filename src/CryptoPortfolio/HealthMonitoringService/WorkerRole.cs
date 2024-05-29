@@ -68,7 +68,15 @@ namespace HealthMonitoringService
 
         private async Task RunAsync(CancellationToken cancellationToken)
         {
-            serviceConnections = await GetHealthCheckEndpointsAsync();
+            serviceConnections = await GetNotificationServiceHealthCheckEndpointsAsync();
+            var webRoleServiceConnection = new ServiceConnection()
+            {
+                Endpoint = "http://localhost:80/PortfolioService/HealthCheck/Check",
+                Service = "WebRole",
+                Instance = "0"
+            };
+            Trace.WriteLine($"Added {webRoleServiceConnection}");
+            serviceConnections.Add(webRoleServiceConnection);
 
             while (!cancellationToken.IsCancellationRequested)
             {
@@ -89,7 +97,7 @@ namespace HealthMonitoringService
             }
         }
 
-        private async Task<List<ServiceConnection>> GetHealthCheckEndpointsAsync()
+        private async Task<List<ServiceConnection>> GetNotificationServiceHealthCheckEndpointsAsync()
         {
             var endpoints = new List<ServiceConnection>();
 
@@ -109,12 +117,14 @@ namespace HealthMonitoringService
             int index = 0;
             foreach (var entity in lastThreeEntries)
             {
-                endpoints.Add(new ServiceConnection()
+                var serviceConnection = new ServiceConnection()
                 {
                     Endpoint = entity.Url,
                     Service = "NotificationService",
                     Instance = index.ToString()
-                });
+                };
+                endpoints.Add(serviceConnection);
+                Trace.WriteLine($"Added {serviceConnection}");
                 index++;
             }
 
@@ -144,5 +154,10 @@ namespace HealthMonitoringService
         public string Endpoint { get; set; }
         public string Service { get; set; }
         public string Instance { get; set; }
+
+        public override string ToString()
+        {
+            return $"{Service}[{Instance}]: {Endpoint}";
+        }
     }
 }
