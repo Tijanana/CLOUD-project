@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NotificationService_WorkerR
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HealthMonitoringService", "HealthMonitoringService\HealthMonitoringService.csproj", "{8B5A383F-4C9A-4301-928F-1C5E278D471B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{65CE9182-86B5-4C3E-A3BF-3F193996DD09}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{8B5A383F-4C9A-4301-928F-1C5E278D471B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B5A383F-4C9A-4301-928F-1C5E278D471B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B5A383F-4C9A-4301-928F-1C5E278D471B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65CE9182-86B5-4C3E-A3BF-3F193996DD09}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65CE9182-86B5-4C3E-A3BF-3F193996DD09}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65CE9182-86B5-4C3E-A3BF-3F193996DD09}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65CE9182-86B5-4C3E-A3BF-3F193996DD09}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,3 +1,4 @@
+using Common;
 using CryptoPortfolioService_Data.Entities;
 using CryptoPortfolioService_Data.Queue;
 using CryptoPortfolioService_Data.Repositories;

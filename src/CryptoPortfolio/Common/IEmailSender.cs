@@ -1,9 +1,8 @@
 ﻿using CryptoPortfolioService_Data.Entities;
-using System;
 using System.ServiceModel;
 using System.Threading.Tasks;
 
-namespace NotificationService_WorkerRole
+namespace Common
 {
     [ServiceContract]
     interface IEmailSender

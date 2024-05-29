@@ -6,7 +6,7 @@ using Microsoft.WindowsAzure.Diagnostics;
 using Microsoft.WindowsAzure.ServiceRuntime;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Table;
-// using NotificationService_WorkerRole;
+using Common;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,7 +24,7 @@ namespace HealthMonitoringService
         private readonly ManualResetEvent runCompleteEvent = new ManualResetEvent(false);
         public List<ServiceConnection> serviceConnections { get; set; } = new List<ServiceConnection>();
         public HealthCheckRepository healthCheckRepository = new HealthCheckRepository();
-        // public EmailSender emailSender = new EmailSender(70);
+        public EmailSender emailSender = new EmailSender(70);
 
         public override void Run()
         {
@@ -103,15 +103,15 @@ namespace HealthMonitoringService
                     else
                     {
                         Trace.TraceInformation($"{serviceConnection.Service}[{serviceConnection.Instance}]: NOT OK.");
-                        // var sentAlert = await emailSender.SendAlertEmail(healthCheck);
-                        /*if (sentAlert)
+                        var sentAlert = await emailSender.SendAlertEmail(healthCheck);
+                        if (sentAlert)
                         {
                             Trace.WriteLine($"[HEALTH MONITORING SERVICE]: Alerted failure of {healthCheck.Service}");
                         }
                         else
                         {
                             Trace.WriteLine($"[HEALTH MONITORING SERVICE]: An error occurred when trying to send email");
-                        }*/
+                        }
                     }
                     healthCheckRepository.AddHealthCheck(healthCheck);
                 }

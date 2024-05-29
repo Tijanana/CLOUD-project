@@ -8,7 +8,7 @@ using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 
-namespace NotificationService_WorkerRole
+namespace Common
 {
     public class EmailSender : IEmailSender
     {
