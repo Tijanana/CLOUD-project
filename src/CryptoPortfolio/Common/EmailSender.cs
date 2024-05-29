@@ -15,13 +15,15 @@ namespace Common
         public int NumberOfCharactersToRemove { get; set; }
         public string ConfigFolder { get; set; }
         public string ConfigFilePath { get; set; }
-        private EmailSettings EmailSettings { get; set; }
+        public string OriginalConfigFilePath { get; set; }
+        public EmailSettings EmailSettings { get; set; }
 
         public EmailSender(int numberOfCharactersToRemove)
         {
             NumberOfCharactersToRemove = numberOfCharactersToRemove;
             ConfigFolder = AppDomain.CurrentDomain.BaseDirectory.Substring(0, AppDomain.CurrentDomain.BaseDirectory.Length - NumberOfCharactersToRemove);
             ConfigFilePath = Path.Combine($"{ConfigFolder}NotificationService_WorkerRole\\bin\\Debug\\appsettings.json");
+            OriginalConfigFilePath = Path.Combine($"{ConfigFolder}NotificationService_WorkerRole\\appsettings.json");
             EmailSettings = LoadEmailSettings();
         }
 
