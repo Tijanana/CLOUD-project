@@ -65,15 +65,26 @@ namespace CryptoPortfolioService_Data.Repositories
             return _table.ExecuteQuery(query).AsQueryable();
         }
 
-        public IQueryable<HealthCheck> GetHealthChecksForLastHour()
+        public IQueryable<HealthCheck> GetWebRoleHealthChecksForLastHour()
         {
+            // Define the time threshold for the last 24 hours
             DateTime oneHourAgo = DateTime.UtcNow.Subtract(TimeSpan.FromHours(1));
+
+            // Create a query filter to retrieve health checks for the specified service and within the last 24 hours
             string partitionFilter = TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, "HealthCheck");
+            string serviceFilter = TableQuery.GenerateFilterCondition("Service", QueryComparisons.Equal, "WebRole");
+            string instanceFilter = TableQuery.GenerateFilterCondition("Instance", QueryComparisons.Equal, "0");
             string timestampFilter = TableQuery.GenerateFilterConditionForDate("Timestamp", QueryComparisons.GreaterThanOrEqual, oneHourAgo);
 
-            string combinedFilter = TableQuery.CombineFilters(partitionFilter, TableOperators.And, timestampFilter);
+            // Combine the filters using the 'And' operator
+            string combinedFilter = TableQuery.CombineFilters(partitionFilter, TableOperators.And, serviceFilter);
+            combinedFilter = TableQuery.CombineFilters(combinedFilter, TableOperators.And, instanceFilter);
+            combinedFilter = TableQuery.CombineFilters(combinedFilter, TableOperators.And, timestampFilter);
 
+            // Create a query using the filter
             TableQuery<HealthCheck> query = new TableQuery<HealthCheck>().Where(combinedFilter);
+
+            // Execute the query and return the results
             return _table.ExecuteQuery(query).AsQueryable();
         }
     }

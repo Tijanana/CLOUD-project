@@ -14,6 +14,5 @@ namespace CryptoPortfolioService_Data.Entities
         public string Status { get; set; }
         public string Service { get; set; }
         public string Instance { get; set; }
-        public new DateTime Timestamp { get; set; }
     }
 }
