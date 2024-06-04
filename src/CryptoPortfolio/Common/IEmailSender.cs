@@ -2,12 +2,15 @@
 using System.ServiceModel;
 using System.Threading.Tasks;
 
-namespace NotificationService_WorkerRole
+namespace Common
 {
     [ServiceContract]
     interface IEmailSender
     {
         [OperationContract]
         Task<bool> SendNotificationEmail(Alarm alarm);
+
+        [OperationContract]
+        Task<bool> SendAlertEmail(HealthCheck healthCheck);
     }
 }

@@ -47,6 +47,22 @@
       <RoleName>CryptoPortfolioService_WebRole</RoleName>
       <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
     </ProjectReference>
+    <ProjectReference Include="..\HealthMonitoringService\HealthMonitoringService.csproj">
+      <Name>HealthMonitoringService</Name>
+      <Project>{8b5a383f-4c9a-4301-928f-1c5e278d471b}</Project>
+      <Private>True</Private>
+      <RoleType>Worker</RoleType>
+      <RoleName>HealthMonitoringService</RoleName>
+      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
+    </ProjectReference>
+    <ProjectReference Include="..\HealthStatusService_WebRole\HealthStatusService_WebRole.csproj">
+      <Name>HealthStatusService_WebRole</Name>
+      <Project>{1c588ea7-2d8b-40a7-a2c9-8ed040558566}</Project>
+      <Private>True</Private>
+      <RoleType>Web</RoleType>
+      <RoleName>HealthStatusService_WebRole</RoleName>
+      <UpdateDiagnosticsConnectionStringOnPublish>True</UpdateDiagnosticsConnectionStringOnPublish>
+    </ProjectReference>
     <ProjectReference Include="..\NotificationService_WorkerRole\NotificationService_WorkerRole.csproj">
       <Name>NotificationService_WorkerRole</Name>
       <Project>{530986b7-6c14-4f30-be21-ae1d3241e001}</Project>
@@ -58,10 +74,14 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="CryptoPortfolioService_WebRoleContent\" />
+    <Folder Include="HealthMonitoringServiceContent\" />
+    <Folder Include="HealthStatusService_WebRoleContent\" />
     <Folder Include="NotificationService_WorkerRoleContent\" />
   </ItemGroup>
   <ItemGroup>
     <DiagnosticsConfiguration Include="CryptoPortfolioService_WebRoleContent\diagnostics.wadcfgx" />
+    <DiagnosticsConfiguration Include="HealthMonitoringServiceContent\diagnostics.wadcfgx" />
+    <DiagnosticsConfiguration Include="HealthStatusService_WebRoleContent\diagnostics.wadcfgx" />
     <DiagnosticsConfiguration Include="NotificationService_WorkerRoleContent\diagnostics.wadcfgx" />
   </ItemGroup>
   <!-- Import the target files for this project template -->

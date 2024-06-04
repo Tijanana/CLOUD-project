@@ -1,9 +1,13 @@
+using Common;
 using CryptoPortfolioService_Data.Entities;
 using CryptoPortfolioService_Data.Queue;
 using CryptoPortfolioService_Data.Repositories;
+using Microsoft.Azure;
 using Microsoft.WindowsAzure;
 using Microsoft.WindowsAzure.Diagnostics;
 using Microsoft.WindowsAzure.ServiceRuntime;
+using Microsoft.WindowsAzure.Storage;
+using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -21,7 +25,8 @@ namespace NotificationService_WorkerRole
         private AlarmRepository _alarmRepository = new AlarmRepository();
         private CryptoCurrencyRepository _cryptoCurrencyRepository = new CryptoCurrencyRepository();
         private NotificationQueueManager _notificationQueueManager = new NotificationQueueManager();
-        private EmailSender _emailSender = new EmailSender();
+        private EmailSender _emailSender = new EmailSender(77);
+        private string healthCheckEndpoint;
 
         public override void Run()
         {
@@ -50,21 +55,105 @@ namespace NotificationService_WorkerRole
 
             bool result = base.OnStart();
 
-            Trace.TraceInformation("CryptoPortfolioService_NotificationService has been started");
+            // Initialize health check listener
+            InitializeHealthCheckListener();
+
+            // Register the health check endpoint
+            RegisterHealthCheckEndpoint();
+
+            Trace.TraceInformation($"NotificationService_WorkerRole has been started with health check endpoint {healthCheckEndpoint}");
 
             return result;
         }
 
         public override void OnStop()
         {
-            Trace.TraceInformation("CryptoPortfolioService_NotificationService is stopping");
+            Trace.TraceInformation("NotificationService_WorkerRole is stopping");
 
             this.cancellationTokenSource.Cancel();
             this.runCompleteEvent.WaitOne();
 
             base.OnStop();
 
-            Trace.TraceInformation("CryptoPortfolioService_NotificationService has stopped");
+            Trace.TraceInformation("NotificationService_WorkerRole has stopped");
+        }
+
+        private void InitializeHealthCheckListener()
+        {
+            // This method initializes the health check listener for the role instance
+            Task.Run(() => ListenForHealthCheck());
+        }
+
+        private void ListenForHealthCheck()
+        {
+            // Use a dynamically assigned port to avoid conflicts
+            string dynamicPrefix = GetDynamicPrefix();
+            healthCheckEndpoint = dynamicPrefix;
+
+            using (var listener = new HttpListener())
+            {
+                listener.Prefixes.Add(dynamicPrefix);
+                listener.Start();
+
+                Trace.TraceInformation($"Listening for health check requests at: {dynamicPrefix}");
+
+                while (true)
+                {
+                    var context = listener.GetContext();
+                    ThreadPool.QueueUserWorkItem(o => HandleHealthCheckRequest(context));
+                }
+            }
+        }
+
+        private string GetDynamicPrefix()
+        {
+            var endpoint = RoleEnvironment.CurrentRoleInstance.InstanceEndpoints["HttpEndpoint"];
+            var dynamicPort = endpoint.IPEndpoint.Port;
+            var prefix = $"http://{endpoint.IPEndpoint.Address}:{dynamicPort}/health-monitoring/";
+
+            return prefix;
+        }
+
+        private void HandleHealthCheckRequest(HttpListenerContext context)
+        {
+            try
+            {
+                var response = context.Response;
+                response.ContentType = "text/plain";
+
+                // Respond with a simple "OK" message for health check requests
+                var responseBody = "OK";
+                var buffer = System.Text.Encoding.UTF8.GetBytes(responseBody);
+                response.ContentLength64 = buffer.Length;
+                response.OutputStream.Write(buffer, 0, buffer.Length);
+                response.Close();
+                Trace.TraceError($"[NOTIFICATION SERVICE]: Responded OK to health check");
+            }
+            catch (Exception ex)
+            {
+                Trace.TraceError($"[NOTIFICATION SERVICE]: Error handling health check request: {ex.Message}");
+                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                context.Response.Close();
+            }
+        }
+        private void RegisterHealthCheckEndpoint()
+        {
+            // Register this URL in Azure Table Storage
+            var storageAccount = CloudStorageAccount.Parse(CloudConfigurationManager.GetSetting("DataConnectionString"));
+            var tableClient = storageAccount.CreateCloudTableClient();
+            var table = tableClient.GetTableReference("HealthCheckEndpoints");
+            table.CreateIfNotExists();
+
+            var instanceId = RoleEnvironment.CurrentRoleInstance.Id;
+            var endpointEntity = new EndpointEntity("NotificationService", instanceId)
+            {
+                Url = healthCheckEndpoint
+            };
+
+            var insertOrReplaceOperation = TableOperation.InsertOrReplace(endpointEntity);
+            table.Execute(insertOrReplaceOperation);
+
+            Trace.TraceInformation($"Registered health check endpoint: {healthCheckEndpoint}");
         }
 
         private async Task RunAsync(CancellationToken cancellationToken)

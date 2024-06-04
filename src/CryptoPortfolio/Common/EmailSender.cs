@@ -8,15 +8,26 @@ using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 
-namespace NotificationService_WorkerRole
+namespace Common
 {
-    class EmailSender : IEmailSender
+    public class EmailSender : IEmailSender
     {
-        private static readonly string ConfigFolder = AppDomain.CurrentDomain.BaseDirectory.Substring(0, AppDomain.CurrentDomain.BaseDirectory.Length - 77);
-        private static readonly string ConfigFilePath = Path.Combine($"{ConfigFolder}NotificationService_WorkerRole\\bin\\Debug\\appsettings.json");
-        private static readonly EmailSettings EmailSettings = LoadEmailSettings();
+        public int NumberOfCharactersToRemove { get; set; }
+        public string ConfigFolder { get; set; }
+        public string ConfigFilePath { get; set; }
+        public string OriginalConfigFilePath { get; set; }
+        public EmailSettings EmailSettings { get; set; }
 
-        private static EmailSettings LoadEmailSettings()
+        public EmailSender(int numberOfCharactersToRemove)
+        {
+            NumberOfCharactersToRemove = numberOfCharactersToRemove;
+            ConfigFolder = AppDomain.CurrentDomain.BaseDirectory.Substring(0, AppDomain.CurrentDomain.BaseDirectory.Length - NumberOfCharactersToRemove);
+            ConfigFilePath = Path.Combine($"{ConfigFolder}NotificationService_WorkerRole\\bin\\Debug\\appsettings.json");
+            OriginalConfigFilePath = Path.Combine($"{ConfigFolder}NotificationService_WorkerRole\\appsettings.json");
+            EmailSettings = LoadEmailSettings();
+        }
+
+        private EmailSettings LoadEmailSettings()
         {
             try
             {
@@ -25,7 +36,7 @@ namespace NotificationService_WorkerRole
             }
             catch (Exception ex)
             {
-                Trace.WriteLine($"[NOTIFICATION SERVICE]: An error occurred when trying to read the configuration file: {ex.Message}");
+                Trace.WriteLine($"[EMAIL SENDER]: An error occurred when trying to read the configuration file: {ex.Message}");
                 return null;
             }
         }
@@ -86,10 +97,55 @@ namespace NotificationService_WorkerRole
                 return false;
             }
         }
+
+        public async Task<bool> SendAlertEmail(HealthCheck healthCheck)
+        {
+            try
+            {
+                if (EmailSettings == null)
+                {
+                    Trace.WriteLine("[HEALTH MONITORING SERVICE]: An error occurred when trying to send email:\n\tFailed to read email settings from configuration file!");
+                    return false;
+                }
+
+                // Create client
+                var smtp = new SmtpClient
+                {
+                    Host = "smtp.gmail.com",
+                    Port = 587,
+                    EnableSsl = true,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    UseDefaultCredentials = false,
+                    Credentials = new NetworkCredential(EmailSettings.EmailUser, EmailSettings.AppPassword)
+                };
+
+                // Create the email message
+                MailMessage mail = new MailMessage();
+                mail.From = new MailAddress(EmailSettings.EmailUser);
+                mail.To.Add(EmailSettings.HealthEmailUser);
+
+                // Fill in message
+                mail.IsBodyHtml = true;
+                var body = "<h1>Healt Alert!</h1>";
+                body += $"<h3><br>Detected failure of the {healthCheck.Service} at {healthCheck.Timestamp.Date} : {healthCheck.Timestamp.TimeOfDay.ToString("hh\\:mm\\:ss")}!";
+                mail.Body = body;
+                mail.Subject = $"Health Alert";
+
+                // Send the email
+                await smtp.SendMailAsync(mail);;
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Trace.WriteLine($"[HEALTH MONITORING SERVICE]: An error occurred when trying to send email: {ex.Message}");
+                return false;
+            }
+        }
     }
 
     public class EmailSettings
     {
+        public string HealthEmailUser { get; set; }
         public string EmailUser { get; set; }
         public string AppPassword { get; set; }
     }
